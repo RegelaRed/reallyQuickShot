@@ -1,12 +1,9 @@
-using UnityEditor.Experimental.RestService;
-
 public class PlayerDashState : PlayerBaseState
 {
-    public PlayerDashState(PlayerController ctx, PlayerStateFactory playerStateFactory)
-    : base(ctx, playerStateFactory) { }
-
+    public PlayerDashState(PlayerController _ctx, PlayerStateFactory _factory)
+    : base(_ctx, _factory) { }
     public override void EnterState() { }
-    public override void Tick() { }
+    public override void UpdateState() { }
     public override void ExitState() { }
     public override void CheckSwitchState() { }
     public override void InitializeSubState() { }

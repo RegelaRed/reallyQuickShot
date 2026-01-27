@@ -1,11 +1,20 @@
 public class PlayerIdleState : PlayerBaseState
 {
-    public PlayerIdleState(PlayerController ctx, PlayerStateFactory playerStateFactory)
-    : base(ctx, playerStateFactory) { }
-
+    public PlayerIdleState(PlayerController _ctx, PlayerStateFactory _factory)
+    : base(_ctx, _factory) { }
     public override void EnterState() { }
-    public override void Tick() { }
+    public override void UpdateState() { CheckSwitchState(); }
     public override void ExitState() { }
-    public override void CheckSwitchState() { }
+    public override void CheckSwitchState()
+    {
+        if (_ctx.Input.IsMovementPressed && !_ctx.Input.IsSprintPressed)
+        {
+            SwitchStates(_factory.Walk());
+        }
+        else if (_ctx.Input.IsMovementPressed && _ctx.Input.IsSprintPressed)
+        {
+            SwitchStates(_factory.Sprint());
+        }
+    }
     public override void InitializeSubState() { }
 }

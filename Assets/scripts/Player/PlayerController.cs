@@ -1,59 +1,81 @@
-using System;
+using System.Net.Mail;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.UIElements.Experimental;
 
 public class PlayerController : MonoBehaviour
 {
     #region Variables
     [Header("References")]
-
     [SerializeField] private CharacterController _characterController;
-    public CharacterController CController => _characterController;
-
     [SerializeField] private Transform _orientation;
-    public Transform Orientation => _orientation;
-
     [SerializeField] private Transform _playerCameraPosition;
-    public Transform PlayerCameraPosition => _playerCameraPosition;
-
     [SerializeField] private Transform _faceDirection;
-    public Transform FaceDirection => _faceDirection;
 
-    //Cinemachine Cameras
+    //Cinemachine Camera
     [SerializeField] private GameObject _mainCamera;
-    public GameObject MainCamera => _mainCamera;
-
     [SerializeField] private GameObject _aimCamera;
-    public GameObject AimCamera => _aimCamera;
-
     [SerializeField] private PlayerVariables _playerVariables;
-    public PlayerVariables PV => _playerVariables;
 
+    //script references
     private PlayerInputHandler _input;
-    public PlayerInputHandler Input => _input;
-
-    private PlayerStateFactory _state;
     private PlayerBaseState _currentState;
+    private PlayerStateFactory _factory;
+    private PlayerMotor _playerMotor;
+
+    //runtime jump references
+    private bool _isJumping;
+    private float _initialJumpVelocity;
+    private bool _requestJumpAgain;
+    private float _jumpGravity;
 
     //getters/setters
+    public CharacterController Controller => _characterController;
+    public Transform Orientation => _orientation;
+    public Transform PlayerCameraPosition => _playerCameraPosition;
+    public Transform FaceDirection => _faceDirection;
+    public GameObject MainCamera => _mainCamera;
+    public GameObject AimCamera => _aimCamera;
+    public PlayerVariables Variables => _playerVariables;
+    public PlayerInputHandler Input => _input;
     public PlayerBaseState CurrentState { get { return _currentState; } set { _currentState = value; } }
+    public PlayerMotor PlayerMotor { get { return _playerMotor; } }
 
-    //static variables
-    [SerializeField] private float _standHeight;
-    public float StandHeight => _standHeight;
+    public bool IsJumping { get { return _isJumping; } set { _isJumping = value; } }
+    public bool RequestJumpAgain { get { return _requestJumpAgain; } set { _requestJumpAgain = value; } }
+    public float InitialJumpVelocity => _initialJumpVelocity;
+    public float JumpGravity => _jumpGravity;
     #endregion
 
+    //updatemethods
     private void Awake()
     {
-        _input = GetComponent<PlayerInputHandler>();
-    }
+        SetupJumpVariables();
 
+        _currentState = _factory.Grounded();
+        _input = GetComponent<PlayerInputHandler>();
+        _playerMotor = GetComponent<PlayerMotor>();
+    }
     private void Update()
     {
-
+        _currentState.UpdateState();
+        _playerMotor.UpdatePhysics();
     }
-    private void FixedUpdate()
-    {
 
+    //Helper Functions
+    private void SetupJumpVariables()
+    {
+        float _timeToApex = _playerVariables.maxJumpTime / 2;
+        _jumpGravity = -2 * _playerVariables.maxJumpHeight / Mathf.Pow(_timeToApex, 2);
+        _initialJumpVelocity = 2 * _playerVariables.maxJumpHeight / _timeToApex;
+    }
+    public void TryJump()
+    {
+        if (CanJump())
+            return;
+        PlayerMotor.ApplyJumpForce(InitialJumpVelocity);
+    }
+    private bool CanJump()
+    {
+        return _characterController.isGrounded && Input.IsJumpPressedThisFrame;
     }
 }

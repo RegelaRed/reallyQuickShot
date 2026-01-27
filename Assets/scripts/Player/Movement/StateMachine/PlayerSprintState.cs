@@ -1,12 +1,20 @@
-using UnityEngine.Playables;
-
 public class PlayerSprintState : PlayerBaseState
 {
-    public PlayerSprintState(PlayerController ctx, PlayerStateFactory playerStateFactory)
-    : base(ctx, playerStateFactory) { }
+    public PlayerSprintState(PlayerController _ctx, PlayerStateFactory _factory)
+    : base(_ctx, _factory) { }
     public override void EnterState() { }
-    public override void Tick() { }
+    public override void UpdateState() { CheckSwitchState(); }
     public override void ExitState() { }
-    public override void CheckSwitchState() { }
+    public override void CheckSwitchState()
+    {
+        if (!_ctx.Input.IsMovementPressed && !_ctx.Input.IsSprintPressed)
+        {
+            SwitchStates(_factory.Idle());
+        }
+        else if (_ctx.Input.IsMovementPressed && !_ctx.Input.IsSprintPressed)
+        {
+            SwitchStates(_factory.Walk());
+        }
+    }
     public override void InitializeSubState() { }
 }

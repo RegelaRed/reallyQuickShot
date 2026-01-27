@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
 public class PlayerInputHandler : MonoBehaviour
 {
     //reference variables
@@ -9,15 +8,16 @@ public class PlayerInputHandler : MonoBehaviour
     public Vector2 CurrentMovementInput { get; private set; }
     public Vector2 CurrentLookInput { get; private set; }
     public bool IsMovementPressed { get; private set; }
-    public bool IsSprinting { get; private set; }
+    public bool IsSprintPressed { get; private set; }
+    public bool IsJumpPressedThisFrame { get; private set; }
     public bool IsJumpPressed { get; private set; }
+    public bool IsDashPressedThisFrame { get; private set; }
     public bool IsDashPressed { get; private set; }
 
     private void Awake()
     {
         _action = new PlayerInputActions();
 
-        _action.Player.Move.started += context => ReadMovementInput(context);
         _action.Player.Move.canceled += context => ReadMovementInput(context);
         _action.Player.Move.performed += context => ReadMovementInput(context);
 
@@ -41,13 +41,21 @@ public class PlayerInputHandler : MonoBehaviour
         IsMovementPressed = CurrentMovementInput.x != 0 || CurrentMovementInput.y != 0;
     }
     void OnLook(InputAction.CallbackContext context) { CurrentLookInput = context.ReadValue<Vector2>(); }
-    void OnSprint(InputAction.CallbackContext context) { IsSprinting = context.ReadValueAsButton(); }
-    void OnJump(InputAction.CallbackContext context) { IsJumpPressed = context.ReadValueAsButton(); }
-    void OnDash(InputAction.CallbackContext context) { IsDashPressed = context.ReadValueAsButton(); }
+    void OnSprint(InputAction.CallbackContext context) { IsSprintPressed = context.ReadValueAsButton(); }
+    void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            IsJumpPressedThisFrame = true;
+        IsJumpPressed = context.ReadValueAsButton();
+    }
+    void OnDash(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            IsDashPressedThisFrame = true;
+        IsDashPressed = context.ReadValueAsButton();
+    }
 
     //playerInput requirements
     public void OnEnable() { _action.Player.Enable(); }
     public void OnDisable() { _action.Player.Disable(); }
-    //Updates
-    private void Update() { }
 }

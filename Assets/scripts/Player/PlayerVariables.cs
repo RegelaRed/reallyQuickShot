@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEditor.EditorTools;
 using UnityEngine;
 
@@ -12,12 +13,17 @@ public class PlayerVariables : ScriptableObject
 
     //Jump
     public float jumpForce = 4;
+    public float maxJumpHeight = 1.4f;
+    public float maxJumpTime = 0.5f;
 
     //Dash
     public float dashForce = 4;
     public int maxDashCharges = 2;
     public float dashRegenTime = 1f;
     public float dashDuration = 0.8f;
+
+    //Gravity
+    public float gravity = 10f;
 
     //LayerMasks
     public LayerMask groundLayer;

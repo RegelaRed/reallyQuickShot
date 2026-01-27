@@ -1,9 +1,16 @@
+using UnityEngine;
+
 public class PlayerGroundedState : PlayerBaseState
 {
-    public PlayerGroundedState(PlayerController ctx, PlayerStateFactory playerStateFactory)
-    : base(ctx, playerStateFactory) { }
+    public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory)
+    : base(_ctx, _factory) { InitializeSubState(); }
     public override void EnterState() { }
-    public override void Tick() { }
+    public override void UpdateState()
+    {
+        CheckSwitchState();
+
+        _ctx.PlayerMotor.SetHorizontalVelocity(_ctx.Input.CurrentMovementInput * Time.deltaTime);
+    }
     public override void ExitState() { }
     public override void CheckSwitchState()
     {
@@ -16,5 +23,19 @@ public class PlayerGroundedState : PlayerBaseState
             SwitchStates(_factory.Dash());
         }
     }
-    public override void InitializeSubState() { }
+    public override void InitializeSubState()
+    {
+        if (!_ctx.Input.IsMovementPressed && !_ctx.Input.IsSprintPressed)
+        {
+            SwitchStates(_factory.Idle());
+        }
+        else if (_ctx.Input.IsMovementPressed && !_ctx.Input.IsSprintPressed)
+        {
+            SwitchStates(_factory.Walk());
+        }
+        else if (_ctx.Input.IsMovementPressed && _ctx.Input.IsSprintPressed)
+        {
+            SwitchStates(_factory.Sprint());
+        }
+    }
 }
