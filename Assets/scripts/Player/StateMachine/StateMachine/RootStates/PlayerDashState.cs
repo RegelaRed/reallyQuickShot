@@ -1,12 +1,10 @@
 using System.Collections;
-using System.Threading;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerDashState : PlayerBaseState
 {
     public PlayerDashState(PlayerController _ctx, PlayerStateFactory _factory)
-    : base(_ctx, _factory) { }
+    : base(_ctx, _factory) { Ctx.RequestDashAgain = false; }
 
     private Coroutine _dashRoutine;
 
@@ -22,6 +20,7 @@ public class PlayerDashState : PlayerBaseState
         {
             Ctx.StopCoroutine(_dashRoutine);
         }
+        Ctx.RequestDashAgain = true;
     }
     public override void CheckSwitchState() { }
     public override void InitializeSubState() { }

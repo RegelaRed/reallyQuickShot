@@ -1,5 +1,6 @@
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
@@ -23,11 +24,12 @@ public class PlayerController : MonoBehaviour
 
     //runtime jump references
     private bool _isJumping;
-    private float _initialJumpVelocity;
     private bool _requestJumpAgain;
+    private float _initialJumpVelocity;
     private float _jumpGravity;
 
     //dash variables
+    private bool _requestDashAgain = false;
     public Coroutine RunCoroutine(IEnumerator routine)
     {
         return StartCoroutine(routine);
@@ -50,6 +52,8 @@ public class PlayerController : MonoBehaviour
     public bool RequestJumpAgain { get { return _requestJumpAgain; } set { _requestJumpAgain = value; } }
     public float InitialJumpVelocity => _initialJumpVelocity;
     public float JumpGravity => _jumpGravity;
+
+    public bool RequestDashAgain { get { return _requestDashAgain; } set { _requestDashAgain = value; } }
     #endregion
 
     //updatemethods
@@ -59,12 +63,13 @@ public class PlayerController : MonoBehaviour
         _playerMotor = GetComponent<PlayerMotor>();
         _factory = new PlayerStateFactory(this);
         _currentState = _factory.Grounded();
+        _currentState.EnterState();
 
         SetupJumpVariables();
     }
     private void Update()
     {
-        _currentState.UpdateState();
+        _currentState.UpdateStates();
         _playerMotor.UpdatePhysics();
 
         Debug.Log(_currentState);
@@ -76,15 +81,5 @@ public class PlayerController : MonoBehaviour
         float _timeToApex = _playerVariables.maxJumpTime / 2;
         _jumpGravity = -2 * _playerVariables.maxJumpHeight / Mathf.Pow(_timeToApex, 2);
         _initialJumpVelocity = 2 * _playerVariables.maxJumpHeight / _timeToApex;
-    }
-    public void TryJump()
-    {
-        if (CanJump())
-            return;
-        PlayerMotor.ApplyJumpForce(InitialJumpVelocity, JumpGravity);
-    }
-    private bool CanJump()
-    {
-        return _characterController.isGrounded && Input.IsJumpPressedThisFrame;
     }
 }

@@ -9,16 +9,6 @@ public class PlayerWalkState : PlayerBaseState
         Ctx.PlayerMotor.SetHorizontalVelocity(Ctx.Input.CurrentMovementInput, Ctx.Variables.walkSpeed);
     }
     public override void ExitState() { }
-    public override void CheckSwitchState()
-    {
-        if (!Ctx.Input.IsMovementPressed && !Ctx.Input.IsSprintPressed)
-        {
-            SwitchStates(Factory.Idle());
-        }
-        else if (Ctx.Input.IsMovementPressed && Ctx.Input.IsSprintPressed)
-        {
-            SwitchStates(Factory.Sprint());
-        }
-    }
+    public override void CheckSwitchState() { }
     public override void InitializeSubState() { }
 }

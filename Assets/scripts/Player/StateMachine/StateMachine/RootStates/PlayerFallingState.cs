@@ -1,28 +1,14 @@
-public class PlayerGroundedState : PlayerBaseState
+public class PlayerFallingState : PlayerBaseState
 {
-    public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory)
-    : base(_ctx, _factory)
-    {
-        IsRootState = true;
-        _ctx.PlayerMotor.SetGravity(_ctx.Variables.gravity);
-        InitializeSubState();
-    }
+    public PlayerFallingState(PlayerController _ctx, PlayerStateFactory _factory)
+     : base(_ctx, _factory) { InitializeSubState(); }
     public override void EnterState() { }
-    public override void UpdateState()
-    {
-        CheckSwitchState();
-    }
+    public override void UpdateState() { CheckSwitchState(); }
     public override void ExitState() { }
     public override void CheckSwitchState()
     {
-        if (Ctx.Input.IsJumpPressed)
-        {
-            SwitchStates(Factory.Jump());
-        }
-        else if (Ctx.Input.IsDashPressed)
-        {
-            SwitchStates(Factory.Dash());
-        }
+        if (Ctx.Controller.isGrounded)
+            SwitchStates(Factory.Grounded());
     }
     public override void InitializeSubState()
     {
