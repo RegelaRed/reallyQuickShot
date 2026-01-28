@@ -10,6 +10,7 @@ public class PlayerMotor : MonoBehaviour
     // Movement state
     private Vector3 _horizontalVelocity;
     private float _verticalVelocity;
+    private float _gravity;
 
     //dash references
     private Vector3 _dashImpulse;
@@ -28,7 +29,7 @@ public class PlayerMotor : MonoBehaviour
     {
         ApplyGravity();
 
-        Vector3 finalVelocity = _horizontalVelocity + Vector3.up * _verticalVelocity + _dashImpulse;
+        Vector3 finalVelocity = _horizontalVelocity + (Vector3.up * _verticalVelocity) + _dashImpulse;
         _ctx.Controller.Move(finalVelocity * Time.deltaTime);
 
         _dashImpulse = Vector3.zero;
@@ -43,23 +44,29 @@ public class PlayerMotor : MonoBehaviour
             _verticalVelocity = -2f;
             return;
         }
-        _verticalVelocity += _variables.gravity * Time.deltaTime;
+        _verticalVelocity += _gravity * Time.deltaTime;
     }
 
     //public API
 
+    public void SetGravity(float gravity)
+    {
+        _gravity = gravity;
+    }
     /// <summary> Set Movement direction </summary>
     /// <param name="velocity"></param>
-    public void SetHorizontalVelocity(Vector3 velocity)
+    public void SetHorizontalVelocity(Vector2 velocity, float speed)
     {
-        _horizontalVelocity = velocity;
+        Debug.Log(velocity);
+        _horizontalVelocity = new Vector3(velocity.x, 0, velocity.y) * speed;
     }
 
     /// <summary>Set Jump Force</summary>
     /// <param name="jumpVelocity"></param>
-    public void ApplyJumpForce(float jumpVelocity)
+    public void ApplyJumpForce(float jumpVelocity, float gravity)
     {
         _verticalVelocity = jumpVelocity;
+        _gravity = gravity;
     }
 
     /// <summary>Set Dash Force</summary>

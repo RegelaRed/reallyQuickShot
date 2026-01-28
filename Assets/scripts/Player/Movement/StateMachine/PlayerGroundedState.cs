@@ -1,41 +1,42 @@
-using UnityEngine;
-
 public class PlayerGroundedState : PlayerBaseState
 {
     public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory)
-    : base(_ctx, _factory) { InitializeSubState(); }
+    : base(_ctx, _factory)
+    {
+        IsRootState = true;
+        _ctx.PlayerMotor.SetGravity(_ctx.Variables.gravity);
+        InitializeSubState();
+    }
     public override void EnterState() { }
     public override void UpdateState()
     {
         CheckSwitchState();
-
-        _ctx.PlayerMotor.SetHorizontalVelocity(_ctx.Input.CurrentMovementInput * Time.deltaTime);
     }
     public override void ExitState() { }
     public override void CheckSwitchState()
     {
-        if (_ctx.Input.IsJumpPressed)
+        if (Ctx.Input.IsJumpPressed)
         {
-            SwitchStates(_factory.Jump());
+            SwitchStates(Factory.Jump());
         }
-        else if (_ctx.Input.IsDashPressed)
+        else if (Ctx.Input.IsDashPressed)
         {
-            SwitchStates(_factory.Dash());
+            SwitchStates(Factory.Dash());
         }
     }
     public override void InitializeSubState()
     {
-        if (!_ctx.Input.IsMovementPressed && !_ctx.Input.IsSprintPressed)
+        if (!Ctx.Input.IsMovementPressed && !Ctx.Input.IsSprintPressed)
         {
-            SwitchStates(_factory.Idle());
+            SetSubState(Factory.Idle());
         }
-        else if (_ctx.Input.IsMovementPressed && !_ctx.Input.IsSprintPressed)
+        else if (Ctx.Input.IsMovementPressed && !Ctx.Input.IsSprintPressed)
         {
-            SwitchStates(_factory.Walk());
+            SetSubState(Factory.Walk());
         }
-        else if (_ctx.Input.IsMovementPressed && _ctx.Input.IsSprintPressed)
+        else if (Ctx.Input.IsMovementPressed && Ctx.Input.IsSprintPressed)
         {
-            SwitchStates(_factory.Sprint());
+            SetSubState(Factory.Sprint());
         }
     }
 }

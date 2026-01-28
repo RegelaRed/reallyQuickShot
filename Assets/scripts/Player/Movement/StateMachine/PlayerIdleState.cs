@@ -7,13 +7,13 @@ public class PlayerIdleState : PlayerBaseState
     public override void ExitState() { }
     public override void CheckSwitchState()
     {
-        if (_ctx.Input.IsMovementPressed && !_ctx.Input.IsSprintPressed)
+        if (Ctx.Input.IsMovementPressed && !Ctx.Input.IsSprintPressed)
         {
-            SwitchStates(_factory.Walk());
+            SwitchStates(Factory.Walk());
         }
-        else if (_ctx.Input.IsMovementPressed && _ctx.Input.IsSprintPressed)
+        else if (Ctx.Input.IsMovementPressed && Ctx.Input.IsSprintPressed)
         {
-            SwitchStates(_factory.Sprint());
+            SwitchStates(Factory.Sprint());
         }
     }
     public override void InitializeSubState() { }

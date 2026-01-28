@@ -1,7 +1,6 @@
-using System.Net.Mail;
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements.Experimental;
-
 public class PlayerController : MonoBehaviour
 {
     #region Variables
@@ -28,6 +27,13 @@ public class PlayerController : MonoBehaviour
     private bool _requestJumpAgain;
     private float _jumpGravity;
 
+    //dash variables
+    public Coroutine RunCoroutine(IEnumerator routine)
+    {
+        return StartCoroutine(routine);
+    }
+
+
     //getters/setters
     public CharacterController Controller => _characterController;
     public Transform Orientation => _orientation;
@@ -49,16 +55,19 @@ public class PlayerController : MonoBehaviour
     //updatemethods
     private void Awake()
     {
-        SetupJumpVariables();
-
-        _currentState = _factory.Grounded();
         _input = GetComponent<PlayerInputHandler>();
         _playerMotor = GetComponent<PlayerMotor>();
+        _factory = new PlayerStateFactory(this);
+        _currentState = _factory.Grounded();
+
+        SetupJumpVariables();
     }
     private void Update()
     {
         _currentState.UpdateState();
         _playerMotor.UpdatePhysics();
+
+        Debug.Log(_currentState);
     }
 
     //Helper Functions
@@ -72,7 +81,7 @@ public class PlayerController : MonoBehaviour
     {
         if (CanJump())
             return;
-        PlayerMotor.ApplyJumpForce(InitialJumpVelocity);
+        PlayerMotor.ApplyJumpForce(InitialJumpVelocity, JumpGravity);
     }
     private bool CanJump()
     {

@@ -1,26 +1,35 @@
+using Unity.VisualScripting;
+
 public abstract class PlayerBaseState
 {
-    protected PlayerController _ctx;
-    protected PlayerStateFactory _factory;
+    private bool _isRootState = false;
+    private PlayerController _ctx;
+    private PlayerStateFactory _factory;
+    private PlayerBaseState _currentSubState;
+    private PlayerBaseState _currentSuperState;
+
+    public bool IsRootState = false;
+    public PlayerController Ctx { get { return _ctx; } }
+    public PlayerStateFactory Factory { get { return _factory; } }
+    public PlayerBaseState CurrentSubState { get { return _currentSubState; } }
+    public PlayerBaseState CurrentSuperState { get { return _currentSuperState; } }
+
     public PlayerBaseState(PlayerController ctx, PlayerStateFactory stateFactory)
     {
         _ctx = ctx;
         _factory = stateFactory;
     }
-    private PlayerBaseState _currentSuperState;
-    private PlayerBaseState _currentSubState;
-    /// <summary>
-    /// Set Enter animator or one time trigger logic into this
-    /// </summary>
+
+    /// <summary>Set Enter animator or one time trigger logic into this</summary>
     public abstract void EnterState();
+    /// <summary>Update Parent state(Root State)</summary>
     public abstract void UpdateState();
-    /// <summary>
-    /// Set Exit animator or one time trigger logic into this
-    /// </summary>
+    /// <summary>Set Exit animator or one time trigger logic into this</summary>
     public abstract void ExitState();
+    /// <summary>Switch SuperStates</summary>
     public abstract void CheckSwitchState();
     public abstract void InitializeSubState();
-
+    /// <summary>Switch RootState/Switch Substate and keep SuperState</summary>
     protected void SwitchStates(PlayerBaseState newState)
     {
         //current state exit
@@ -28,10 +37,27 @@ public abstract class PlayerBaseState
         //new state enter
         newState.EnterState();
 
-        //switch current state context
-        _ctx.CurrentState = newState;
+        if (_isRootState)
+        {
+            //switch current state context
+            _ctx.CurrentState = newState;
+        }
+        else if (_currentSuperState != null)
+        {
+            _currentSuperState.SetSubState(newState);
+        }
     }
-    protected void UpdateStates() { }
+    /// <summary>Update SubstatesStates if any</summary>
+    public void UpdateStates()
+    {
+        UpdateState();
+        if (_currentSubState != null)
+        {
+            _currentSubState.UpdateStates();
+        }
+    }
+    /// <summary>Exit All SubStates if any</summary>
+    public void ExitStates() { }
     protected void SetSuperState(PlayerBaseState newSuperState)
     {
         _currentSuperState = newSuperState;

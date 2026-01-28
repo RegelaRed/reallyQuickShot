@@ -5,14 +5,26 @@ public class PlayerInputHandler : MonoBehaviour
 {
     //reference variables
     private PlayerInputActions _action;
-    public Vector2 CurrentMovementInput { get; private set; }
-    public Vector2 CurrentLookInput { get; private set; }
-    public bool IsMovementPressed { get; private set; }
-    public bool IsSprintPressed { get; private set; }
-    public bool IsJumpPressedThisFrame { get; private set; }
-    public bool IsJumpPressed { get; private set; }
-    public bool IsDashPressedThisFrame { get; private set; }
-    public bool IsDashPressed { get; private set; }
+    private Vector2 _currentMovementInput;
+    private Vector2 _currentLookInput;
+    private bool _isMovementPressed;
+    private bool _isSprintPressed;
+    private bool _sprintToggle = false;
+    private bool _isJumpPressedThisFrame;
+    private bool _isJumpPressed;
+    private bool _isDashPressedThisFrame;
+    private bool _isDashPressed;
+
+
+    public Vector2 CurrentMovementInput { get { return _currentMovementInput; } }
+    public Vector2 CurrentLookInput { get { return _currentLookInput; } }
+    public bool IsMovementPressed { get { return _isMovementPressed; } }
+    public bool IsSprintPressed { get { return _isSprintPressed; } }
+    public bool SprintToggle { get { return _sprintToggle; } }
+    public bool IsJumpPressedThisFrame { get { return _isJumpPressedThisFrame; } }
+    public bool IsJumpPressed { get { return _isJumpPressed; } }
+    public bool IsDashPressedThisFrame { get { return _isDashPressedThisFrame; } }
+    public bool IsDashPressed { get { return _isDashPressedThisFrame; } }
 
     private void Awake()
     {
@@ -37,22 +49,27 @@ public class PlayerInputHandler : MonoBehaviour
     //calback references
     void ReadMovementInput(InputAction.CallbackContext context)
     {
-        CurrentMovementInput = context.ReadValue<Vector2>();
-        IsMovementPressed = CurrentMovementInput.x != 0 || CurrentMovementInput.y != 0;
+        _currentMovementInput = context.ReadValue<Vector2>().normalized;
+        _isMovementPressed = CurrentMovementInput.x != 0 || CurrentMovementInput.y != 0;
     }
-    void OnLook(InputAction.CallbackContext context) { CurrentLookInput = context.ReadValue<Vector2>(); }
-    void OnSprint(InputAction.CallbackContext context) { IsSprintPressed = context.ReadValueAsButton(); }
+    void OnLook(InputAction.CallbackContext context) { _currentLookInput = context.ReadValue<Vector2>(); }
+    void OnSprint(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            _sprintToggle = !_sprintToggle;
+        _isSprintPressed = context.ReadValueAsButton();
+    }
     void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed)
-            IsJumpPressedThisFrame = true;
-        IsJumpPressed = context.ReadValueAsButton();
+            _isJumpPressedThisFrame = true;
+        _isJumpPressed = context.ReadValueAsButton();
     }
     void OnDash(InputAction.CallbackContext context)
     {
         if (context.performed)
-            IsDashPressedThisFrame = true;
-        IsDashPressed = context.ReadValueAsButton();
+            _isDashPressedThisFrame = true;
+        _isDashPressed = context.ReadValueAsButton();
     }
 
     //playerInput requirements
