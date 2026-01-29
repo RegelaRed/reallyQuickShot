@@ -2,10 +2,7 @@ public class PlayerGroundedState : PlayerBaseState
 {
     public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory)
     : base(_ctx, _factory)
-    {
-        IsRootState = true;
-        _ctx.PlayerMotor.SetGravity(_ctx.Variables.gravity);
-    }
+    { _ctx.PlayerMotor.Gravity = _ctx.Variables.gravity; }
     public override void EnterState() { InitializeSubState(); }
     public override void UpdateState()
     {
@@ -15,15 +12,15 @@ public class PlayerGroundedState : PlayerBaseState
     public override void ExitState() { }
     public override void CheckSwitchState()
     {
-        if (Ctx.Input.IsJumpPressed && !Ctx.RequestJumpAgain)
+        if (Ctx.Input.IsJumpPressed && Ctx.Input.IsJumpPressedThisFrame)
         {
             SwitchStates(Factory.Jump());
         }
-        else if (Ctx.Input.SprintToggle && !Ctx.RequestDashAgain)
+        else if (Ctx.Input.IsDashPressed && Ctx.Input.IsDashPressedThisFrame)
         {
             SwitchStates(Factory.Dash());
         }
-        else if (!Ctx.Controller.isGrounded)
+        else if (!Ctx.IsOnGround)
         {
             SwitchStates(Factory.Falling());
         }
@@ -32,37 +29,28 @@ public class PlayerGroundedState : PlayerBaseState
     private void UpdateSubstate()
     {
         PlayerBaseState desiredState = GetDesiredState();
-        if (CurrentSubState?.GetType() != desiredState.GetType())
+        if (CurrentSubState.GetType() != desiredState.GetType())
         {
-            CurrentSubState?.ExitState();
+            CurrentSubState.ExitState();
             SetSubState(desiredState);
             desiredState.EnterState();
         }
     }
     private PlayerBaseState GetDesiredState()
     {
-        if (!Ctx.Input.IsMovementPressed && !Ctx.Input.SprintToggle)
-            return Factory.Idle();
-        else if (Ctx.Input.IsMovementPressed && !Ctx.Input.SprintToggle)
-            return Factory.Walk();
-        else if (Ctx.Input.IsMovementPressed && Ctx.Input.SprintToggle)
+
+        if (Ctx.Input.IsMovementPressed && Ctx.Input.SprintToggle)
             return Factory.Sprint();
-        return null;
+        else if (Ctx.Input.IsMovementPressed)
+            return Factory.Walk();
+        else
+            return Factory.Idle();
     }
 
     public override void InitializeSubState()
     {
-        if (!Ctx.Input.IsMovementPressed && !Ctx.Input.SprintToggle)
-        {
-            SetSubState(Factory.Idle());
-        }
-        else if (Ctx.Input.IsMovementPressed && !Ctx.Input.SprintToggle)
-        {
-            SetSubState(Factory.Walk());
-        }
-        else if (Ctx.Input.IsMovementPressed && Ctx.Input.SprintToggle)
-        {
-            SetSubState(Factory.Sprint());
-        }
+        PlayerBaseState desiredState = GetDesiredState();
+        if (desiredState != null)
+            SetSubState(desiredState);
     }
 }

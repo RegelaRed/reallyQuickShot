@@ -5,12 +5,21 @@ public class PlayerMotor : MonoBehaviour
     #region References
     // Cached references
     private PlayerController _ctx;
-    private PlayerVariables _variables;
 
     // Movement state
-    private Vector3 _horizontalVelocity;
-    private float _verticalVelocity;
+    private float _verticalVecloity;
+
+    private Vector3 _movementVector;
+    private Vector3 _forwardInpulse;
     private float _gravity;
+    private float _speed;
+
+    //Getters and Setters
+    public float VerticalVelocity { get { return _verticalVecloity; } }
+    public Vector3 MovementVector { get { return _movementVector; } }
+    public Vector3 ForwardInpulse { get { return _forwardInpulse; } }
+    public float Speed { get { return _speed; } }
+    public float Gravity { get { return _gravity; } set { _gravity = value; } }
 
     //dash references
     private Vector3 _dashImpulse;
@@ -23,56 +32,102 @@ public class PlayerMotor : MonoBehaviour
     private void Awake()
     {
         _ctx = GetComponent<PlayerController>();
-        _variables = _ctx.Variables;
     }
     public void UpdatePhysics()
     {
         ApplyGravity();
 
-        Vector3 finalVelocity = _horizontalVelocity + (Vector3.up * _verticalVelocity) + _dashImpulse;
+        Vector3 finalVelocity = FinalMovevector();
+
         _ctx.Controller.Move(finalVelocity * Time.deltaTime);
 
         _dashImpulse = Vector3.zero;
     }
 
     /// Helper functions
-    private void ApplyGravity()
+    private Vector3 FinalMovevector()
     {
-        if (_ctx.Controller.isGrounded && _verticalVelocity < 0f)
-        {
-            // small downward force to stay grounded
-            _verticalVelocity = -2f;
-            return;
-        }
-        _verticalVelocity += _gravity * Time.deltaTime;
+        Vector3 finalMoveVector = MovementVector * _speed + (Vector3.up * _verticalVecloity) + ForwardInpulse;
+        return finalMoveVector;
     }
 
     //public API
-
-    public void SetGravity(float gravity)
+    public void SetMovementInput(Vector2 input)
     {
-        _gravity = gravity;
+        _movementVector.x = input.x;
+        _movementVector.z = input.y;
     }
-    /// <summary> Set Movement direction </summary>
-    /// <param name="velocity"></param>
-    public void SetHorizontalVelocity(Vector2 velocity, float speed)
+    public void SetSpeed(float speed)
     {
-        Debug.Log(velocity);
-        _horizontalVelocity = new Vector3(velocity.x, 0, velocity.y) * speed;
+        _speed = speed;
     }
-
-    /// <summary>Set Jump Force</summary>
-    /// <param name="jumpVelocity"></param>
-    public void ApplyJumpForce(float jumpVelocity, float gravity)
+    public void SetJumpVelocity(float upWardForce)
     {
-        _verticalVelocity = jumpVelocity;
-        _gravity = gravity;
+        _verticalVecloity = upWardForce;
+    }
+    public void SetInpulse(Vector3 inpulse)
+    {
+        _forwardInpulse = inpulse;
     }
 
-    /// <summary>Set Dash Force</summary>
-    /// <param name="impulse"></param>
-    public void ApplyImpulse(Vector3 impulse)
+    private void ApplyGravity()
     {
-        _dashImpulse = impulse;
+        if (_ctx.IsOnGround && _verticalVecloity < 0f)
+        {
+            // small downward force to stay grounded
+            _verticalVecloity = -2f;
+            return;
+        }
+        _verticalVecloity = Mathf.Clamp(_verticalVecloity, _verticalVecloity, Gravity);
+        _verticalVecloity += Gravity * Time.deltaTime;
     }
 }
+
+/// methods needed
+/// set gravity
+/// set speed
+/// set input
+/// set vertical velocity(Jump Force)
+/// set Inpulse(Dash Force) 
+
+// public void SetGravity(float gravity)
+// {
+//     _gravity = gravity;
+// }
+// public void SetSpeed(float speed)
+// {
+//     _speed = speed;
+// }
+// public void SetMoveInput(Vector2 moveInput)
+// {
+//     _movementVector.x = moveInput.x;
+//     _movementVector.z = moveInput.y;
+// }
+// public void SetUpwardForce(float upForce)
+// {
+//     _upWardForce = upForce;
+// }
+
+
+/// <summary> Set Movement direction </summary>
+/// <param name="velocity"></param>
+// public void SetHorizontalVelocity(Vector2 velocity, float speed)
+// {
+//     Debug.Log(velocity);
+//     _horizontalVelocity = new Vector3(velocity.x, 0, velocity.y) * speed;
+// }
+
+// /// <summary>Set Jump Force</summary>
+// /// <param name="jumpVelocity"></param>
+// public void ApplyJumpForce(float jumpVelocity, float gravity)
+// {
+//     _verticalVelocity = jumpVelocity;
+//     _gravity = gravity;
+// }
+
+// /// <summary>Set Dash Force</summary>
+// /// <param name="impulse"></param>
+// public void ApplyImpulse(Vector3 impulse)
+// {
+//     _dashImpulse = impulse;
+// }

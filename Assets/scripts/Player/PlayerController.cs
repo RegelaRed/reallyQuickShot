@@ -52,8 +52,8 @@ public class PlayerController : MonoBehaviour
     public bool RequestJumpAgain { get { return _requestJumpAgain; } set { _requestJumpAgain = value; } }
     public float InitialJumpVelocity => _initialJumpVelocity;
     public float JumpGravity => _jumpGravity;
-
     public bool RequestDashAgain { get { return _requestDashAgain; } set { _requestDashAgain = value; } }
+    public bool IsOnGround { get { return Controller.isGrounded; } }
     #endregion
 
     //updatemethods
@@ -67,12 +67,23 @@ public class PlayerController : MonoBehaviour
 
         SetupJumpVariables();
     }
+    //tempdebug variables
+    PlayerBaseState lastState;
+    PlayerBaseState lastSubState;
     private void Update()
     {
         _currentState.UpdateStates();
         _playerMotor.UpdatePhysics();
-
-        Debug.Log(_currentState);
+        if (lastState != _currentState)
+        {
+            Debug.Log("Current Superstate" + _currentState?.GetType());
+            lastState = _currentState;
+        }
+        if (lastSubState != _currentState.CurrentSubState)
+        {
+            Debug.Log("Current SubState" + _currentState.CurrentSubState);
+            lastSubState = _currentState.CurrentSubState;
+        }
     }
 
     //Helper Functions

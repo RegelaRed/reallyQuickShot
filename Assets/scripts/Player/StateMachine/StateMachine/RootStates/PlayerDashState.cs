@@ -4,13 +4,13 @@ using UnityEngine;
 public class PlayerDashState : PlayerBaseState
 {
     public PlayerDashState(PlayerController _ctx, PlayerStateFactory _factory)
-    : base(_ctx, _factory) { Ctx.RequestDashAgain = false; }
+    : base(_ctx, _factory) { }
 
     private Coroutine _dashRoutine;
 
     public override void EnterState()
     {
-        Ctx.PlayerMotor.ApplyImpulse(Ctx.Variables.dashForce * Ctx.Orientation.forward.normalized);
+        Ctx.PlayerMotor.SetInpulse(Ctx.Variables.dashForce * Ctx.Orientation.forward.normalized);
         _dashRoutine = Ctx.StartCoroutine(DashTimer());
     }
     public override void UpdateState() { }
@@ -20,7 +20,7 @@ public class PlayerDashState : PlayerBaseState
         {
             Ctx.StopCoroutine(_dashRoutine);
         }
-        Ctx.RequestDashAgain = true;
+        Ctx.PlayerMotor.SetInpulse(Vector3.zero);
     }
     public override void CheckSwitchState() { }
     public override void InitializeSubState() { }
@@ -28,6 +28,9 @@ public class PlayerDashState : PlayerBaseState
     IEnumerator DashTimer()
     {
         yield return new WaitForSeconds(0.5f);
-        SwitchStates(Factory.Grounded());
+        if (Ctx.IsOnGround)
+            SwitchStates(Factory.Grounded());
+        else
+            SwitchStates(Factory.Falling());
     }
 }

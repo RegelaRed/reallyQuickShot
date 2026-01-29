@@ -25,6 +25,8 @@ public class PlayerVariables : ScriptableObject
     //Gravity
     public float gravity = 10f;
 
+    // Air
+    public float airMoveSpeed = 0.6f;
     //LayerMasks
     public LayerMask groundLayer;
 

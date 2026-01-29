@@ -5,19 +5,21 @@ public class PlayerJumpState : PlayerBaseState
 
     public override void EnterState()
     {
-        Ctx.RequestJumpAgain = false;
-        Ctx.PlayerMotor.ApplyJumpForce(Ctx.InitialJumpVelocity, Ctx.JumpGravity);
+        Ctx.PlayerMotor.Gravity = Ctx.JumpGravity;
+        Ctx.PlayerMotor.SetSpeed(Ctx.Variables.airMoveSpeed);
+        Ctx.PlayerMotor.SetJumpVelocity(Ctx.InitialJumpVelocity);
         InitializeSubState();
     }
-    public override void UpdateState() { CheckSwitchState(); }
-    public override void ExitState()
+    public override void UpdateState()
     {
-        if (Ctx.Input.IsJumpPressed)
-            Ctx.RequestJumpAgain = true;
+        CheckSwitchState();
+        UpdateSubstate();
+        Ctx.PlayerMotor.SetMovementInput(Ctx.Input.CurrentMovementInput);
     }
+    public override void ExitState() { }
     public override void CheckSwitchState()
     {
-        if (Ctx.Controller.isGrounded)
+        if (Ctx.IsOnGround)
         {
             SwitchStates(Factory.Grounded());
         }
@@ -28,5 +30,19 @@ public class PlayerJumpState : PlayerBaseState
             SetSubState(Factory.JumpAscending());
         else
             SetSubState(Factory.JumpDescending());
+    }
+
+    private void UpdateSubstate()
+    {
+        if (Ctx.PlayerMotor.VerticalVelocity > 0 && CurrentSubState?.GetType() != typeof(PlayerJumpAscending))
+        {
+            CurrentSubState?.ExitState();
+            SetSubState(Factory.JumpAscending());
+        }
+        else if (CurrentSubState?.GetType() != typeof(PlayerJumpDescending))
+        {
+            CurrentSubState?.ExitState();
+            SetSubState(Factory.JumpAscending());
+        }
     }
 }
