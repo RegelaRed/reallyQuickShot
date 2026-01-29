@@ -10,19 +10,19 @@ public class PlayerMotor : MonoBehaviour
     private float _verticalVecloity;
 
     private Vector3 _movementVector;
-    private Vector3 _forwardInpulse;
+    private Vector3 _forwardImpulse;
     private float _gravity;
     private float _speed;
 
     //Getters and Setters
     public float VerticalVelocity { get { return _verticalVecloity; } }
     public Vector3 MovementVector { get { return _movementVector; } }
-    public Vector3 ForwardInpulse { get { return _forwardInpulse; } }
+    public Vector3 ForwardInpulse { get { return _forwardImpulse; } }
     public float Speed { get { return _speed; } }
-    public float Gravity { get { return _gravity; } set { _gravity = value; } }
+    public float Gravity { get { return _gravity; } }
 
     //dash references
-    private Vector3 _dashImpulse;
+
 
     //private bool _isGrounded => _ctx.Controller.isGrounded;
 
@@ -37,15 +37,15 @@ public class PlayerMotor : MonoBehaviour
     {
         ApplyGravity();
 
-        Vector3 finalVelocity = FinalMovevector();
+        Vector3 finalVelocity = FinalMoveVector();
 
         _ctx.Controller.Move(finalVelocity * Time.deltaTime);
 
-        _dashImpulse = Vector3.zero;
+        _forwardImpulse = Vector3.zero;
     }
 
     /// Helper functions
-    private Vector3 FinalMovevector()
+    private Vector3 FinalMoveVector()
     {
         Vector3 finalMoveVector = MovementVector * _speed + (Vector3.up * _verticalVecloity) + ForwardInpulse;
         return finalMoveVector;
@@ -57,6 +57,10 @@ public class PlayerMotor : MonoBehaviour
         _movementVector.x = input.x;
         _movementVector.z = input.y;
     }
+    public void SetGravity(float gravity)
+    {
+        _gravity = gravity;
+    }
     public void SetSpeed(float speed)
     {
         _speed = speed;
@@ -67,7 +71,7 @@ public class PlayerMotor : MonoBehaviour
     }
     public void SetInpulse(Vector3 inpulse)
     {
-        _forwardInpulse = inpulse;
+        _forwardImpulse = inpulse;
     }
 
     private void ApplyGravity()
@@ -78,7 +82,7 @@ public class PlayerMotor : MonoBehaviour
             _verticalVecloity = -2f;
             return;
         }
-        _verticalVecloity = Mathf.Clamp(_verticalVecloity, _verticalVecloity, Gravity);
+        // _verticalVecloity = Mathf.Max(_verticalVecloity, Gravity);
         _verticalVecloity += Gravity * Time.deltaTime;
     }
 }

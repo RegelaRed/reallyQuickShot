@@ -4,7 +4,11 @@ public class PlayerIdleState : PlayerBaseState
 {
     public PlayerIdleState(PlayerController _ctx, PlayerStateFactory _factory)
     : base(_ctx, _factory) { }
-    public override void EnterState() { Ctx.PlayerMotor.SetMovementInput(Vector2.zero); }
+    public override void EnterState()
+    {
+        Ctx.PlayerMotor.SetSpeed(0f);
+        Ctx.PlayerMotor.SetMovementInput(Vector2.zero);
+    }
     public override void UpdateState() { CheckSwitchState(); }
     public override void ExitState() { }
     public override void CheckSwitchState() { }

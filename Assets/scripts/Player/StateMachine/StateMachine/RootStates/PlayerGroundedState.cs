@@ -2,7 +2,7 @@ public class PlayerGroundedState : PlayerBaseState
 {
     public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory)
     : base(_ctx, _factory)
-    { _ctx.PlayerMotor.Gravity = _ctx.Variables.gravity; }
+    { _ctx.PlayerMotor.SetGravity(_ctx.Variables.gravity); }
     public override void EnterState() { InitializeSubState(); }
     public override void UpdateState()
     {
@@ -16,8 +16,9 @@ public class PlayerGroundedState : PlayerBaseState
         {
             SwitchStates(Factory.Jump());
         }
-        else if (Ctx.Input.IsDashPressed && Ctx.Input.IsDashPressedThisFrame)
+        else if (Ctx.CanDash && Ctx.Input.IsDashPressedThisFrame)
         {
+            Ctx.DashTime = Ctx.Variables.dashRegenTime;
             SwitchStates(Factory.Dash());
         }
         else if (!Ctx.IsOnGround)
@@ -29,11 +30,10 @@ public class PlayerGroundedState : PlayerBaseState
     private void UpdateSubstate()
     {
         PlayerBaseState desiredState = GetDesiredState();
-        if (CurrentSubState.GetType() != desiredState.GetType())
+        if (CurrentSubState?.GetType() != desiredState?.GetType())
         {
             CurrentSubState.ExitState();
             SetSubState(desiredState);
-            desiredState.EnterState();
         }
     }
     private PlayerBaseState GetDesiredState()

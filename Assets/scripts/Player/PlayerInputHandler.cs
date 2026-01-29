@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour
 {
+    #region Private References
     //reference variables
     private PlayerInputActions _action;
     private Vector2 _currentMovementInput;
@@ -14,8 +15,8 @@ public class PlayerInputHandler : MonoBehaviour
     private bool _isJumpPressed;
     private bool _isDashPressedThisFrame;
     private bool _isDashPressed;
-
-
+    #endregion
+    #region Getters/Setters
     public Vector2 CurrentMovementInput { get { return _currentMovementInput; } }
     public Vector2 CurrentLookInput { get { return _currentLookInput; } }
     public bool IsMovementPressed { get { return _isMovementPressed; } }
@@ -24,8 +25,8 @@ public class PlayerInputHandler : MonoBehaviour
     public bool IsJumpPressedThisFrame { get { return _isJumpPressedThisFrame; } }
     public bool IsJumpPressed { get { return _isJumpPressed; } }
     public bool IsDashPressedThisFrame { get { return _isDashPressedThisFrame; } }
-    public bool IsDashPressed { get { return _isDashPressedThisFrame; } }
-
+    public bool IsDashPressed { get { return _isDashPressed; } }
+    #endregion
     private void Awake()
     {
         _action = new PlayerInputActions();
@@ -46,7 +47,7 @@ public class PlayerInputHandler : MonoBehaviour
         _action.Player.Look.canceled += context => OnLook(context);
     }
 
-    //calback references
+    #region calback references
     void ReadMovementInput(InputAction.CallbackContext context)
     {
         _currentMovementInput = context.ReadValue<Vector2>().normalized;
@@ -71,7 +72,7 @@ public class PlayerInputHandler : MonoBehaviour
             _isDashPressedThisFrame = true;
         _isDashPressed = context.ReadValueAsButton();
     }
-
+    #endregion
     //playerInput requirements
     public void OnEnable() { _action.Player.Enable(); }
     public void OnDisable() { _action.Player.Disable(); }

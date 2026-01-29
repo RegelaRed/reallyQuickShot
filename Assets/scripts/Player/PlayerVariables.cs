@@ -15,11 +15,12 @@ public class PlayerVariables : ScriptableObject
     public float jumpForce = 4;
     public float maxJumpHeight = 1.4f;
     public float maxJumpTime = 0.5f;
+    public float cyoteTime = 0.4f;
 
     //Dash
     public float dashForce = 4;
     public int maxDashCharges = 2;
-    public float dashRegenTime = 1f;
+    public float dashRegenTime = 0.6f;
     public float dashDuration = 0.8f;
 
     //Gravity
