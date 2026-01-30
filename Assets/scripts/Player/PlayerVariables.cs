@@ -1,5 +1,3 @@
-using JetBrains.Annotations;
-using UnityEditor.EditorTools;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Game Data/Player Stats")]
@@ -20,6 +18,7 @@ public class PlayerVariables : ScriptableObject
     public float dashRegenTime = 0.6f;
     public float dashDuration = 0.8f;
     public float dashDistance = 2f;
+    public float samllDashJumpHeight = 0.5f;
 
     [Header("Gravity")]
     public float gravity = 10f;
@@ -27,7 +26,7 @@ public class PlayerVariables : ScriptableObject
     [Header("Air")]
     public float airMoveSpeed = 0.6f;
     public float maxAirSpeed = 2f;
-    public float airControll = 2f;
+    public float airControl = 2f;
 
     [Header("Camera and Rotation")]
     [Tooltip(" lower value -> slower turn")]

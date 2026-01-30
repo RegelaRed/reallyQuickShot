@@ -6,7 +6,14 @@ public class PlayerJumpState : PlayerBaseState
     public override void EnterState()
     {
         Ctx.PlayerMotor.SetGravity(Ctx.JumpGravity);
-        Ctx.PlayerMotor.SetJumpVelocity(Ctx.InitialJumpVelocity);
+        if (Ctx.PlayerMotor.CurrentSpeed <= 0f)
+        {
+            if (Ctx.Input.SprintToggle)
+                Ctx.PlayerMotor.SetSpeed(Ctx.Variables.sprintSpeed);
+            else
+                Ctx.PlayerMotor.SetSpeed(Ctx.Variables.walkSpeed);
+        }
+        Ctx.PlayerMotor.SetUpwardVelocity(Ctx.InitialJumpVelocity);
         InitializeSubState();
     }
     public override void UpdateState()

@@ -19,7 +19,7 @@ public class PlayerFallingState : PlayerBaseState
         Ctx.TimeLeftOnGround += Time.deltaTime;
         if (Ctx.IsOnGround)
             SwitchStates(Factory.Grounded());
-        if (Ctx.Input.IsJumpPressed && Ctx.TimeLeftOnGround <= Ctx.Variables.cyoteTime && Ctx.IsOnGround)
+        else if (Ctx.Input.IsJumpPressed && Ctx.CyoteTrue)
             SwitchStates(Factory.Jump());
     }
     public override void InitializeSubState() { }

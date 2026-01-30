@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class PlayerDashState : PlayerBaseState
 {
     public PlayerDashState(PlayerController _ctx, PlayerStateFactory _factory)
@@ -5,13 +7,18 @@ public class PlayerDashState : PlayerBaseState
 
     public override void EnterState()
     {
-        if (Ctx.Input.IsAiming)
-            Ctx.PlayerMotor.StartDash(Ctx.Variables.dashDistance, Ctx.Variables.dashDuration, Ctx.Orientation.forward);
+        Vector3 dashDirection;
+        if (Ctx.CurrentCameraState is PlayerAimCamera)
+            dashDirection = Ctx.Orientation.forward;
         else
-            Ctx.PlayerMotor.StartDash(Ctx.Variables.dashDistance, Ctx.Variables.dashDuration, Ctx.FaceDirection.forward);
+            dashDirection = Ctx.FaceDirection.forward;
+
+        Ctx.PlayerMotor.StartDash(Ctx.Variables.dashDistance, Ctx.Variables.dashDuration, dashDirection);
+        Ctx.PlayerMotor.SetGravity(Ctx.DashGravity);
+        Ctx.PlayerMotor.SetUpwardVelocity(Ctx.InitialDashVelocity);
     }
     public override void UpdateState() { CheckSwitchState(); }
-    public override void ExitState() { }
+    public override void ExitState() { }    
     public override void CheckSwitchState()
     {
         if (Ctx.PlayerMotor.IsDashing)
@@ -23,4 +30,6 @@ public class PlayerDashState : PlayerBaseState
             SwitchStates(Factory.Falling());
     }
     public override void InitializeSubState() { }
+
+
 }

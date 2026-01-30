@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerMotor _playerMotor;
 
     //runtime jump references
-    private float _timeLeftOnGround;
+    private float _cyoteTimer;
     private float _initialJumpVelocity;
     private float _jumpGravity;
 
@@ -32,6 +32,8 @@ public class PlayerController : MonoBehaviour
     private float _dashIntervalTimer;
     private float _dashRegenTimer;
     private int _currentDashCharges;
+    private float _initialDashVelocity;
+    private float _dashGravity;
 
     #endregion
     #region Getters/Setters
@@ -52,13 +54,16 @@ public class PlayerController : MonoBehaviour
 
     //Jump
     public float InitialJumpVelocity { get { return _initialJumpVelocity; } }
-    public float TimeLeftOnGround { get { return _timeLeftOnGround; } set { _timeLeftOnGround = value; } }
+    public float TimeLeftOnGround { get { return _cyoteTimer; } set { _cyoteTimer = value; } }
+    public bool CyoteTrue { get { return _cyoteTimer < 0; } }
     public float JumpGravity { get { return _jumpGravity; } }
 
     //dash
     public float DashCooldownTimer { get { return _dashIntervalTimer; } set { _dashIntervalTimer = value; } }
     public int AvalableDashCharges { get { return _currentDashCharges; } }
     public bool CanDash { get { return _dashIntervalTimer <= 0f && _currentDashCharges > 0; } }
+    public float InitialDashVelocity { get { return _initialDashVelocity; } }
+    public float DashGravity { get { return _dashGravity; } }
 
     //Ground
     public bool IsOnGround { get { return Controller.isGrounded; } }
@@ -84,11 +89,13 @@ public class PlayerController : MonoBehaviour
         //jump
         SetupJumpVariables();
         //dash
+        SetupDashVariales();
         _currentDashCharges = _playerVariables.maxDashCharges;
     }
 
     private void Update()
     {
+        CyoteTimer();
         DashIntervalTimer();
         DashRegenen();
 
@@ -97,17 +104,25 @@ public class PlayerController : MonoBehaviour
         _playerMotor.UpdatePhysics();
 
         _currentCameraState?.UpdateStates();
-
-        // Debug.Log("Current state " + CurrentMovementState + " " + "Current Sub state" + CurrentMovementState.CurrentSubState);
-        // Debug.Log("Current camera state" + CurrentCameraState);
     }
 
     //Helper Functions
+    private void CyoteTimer()
+    {
+        if (_cyoteTimer > 0)
+            _cyoteTimer -= Time.deltaTime;
+    }
     private void SetupJumpVariables()
     {
         float _timeToApex = _playerVariables.maxJumpTime / 2;
         _jumpGravity = -2 * _playerVariables.maxJumpHeight / Mathf.Pow(_timeToApex, 2);
         _initialJumpVelocity = 2 * _playerVariables.maxJumpHeight / _timeToApex;
+    }
+    private void SetupDashVariales()
+    {
+        float _timeToApex = Variables.dashDuration / 2;
+        _dashGravity = -2 * _playerVariables.samllDashJumpHeight / Mathf.Pow(_timeToApex, 2);
+        _initialDashVelocity = 2 * Variables.samllDashJumpHeight / _timeToApex;
     }
     public void DashConsume()
     {

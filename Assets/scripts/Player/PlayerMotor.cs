@@ -1,6 +1,4 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 
 public class PlayerMotor : MonoBehaviour
 {
@@ -14,7 +12,7 @@ public class PlayerMotor : MonoBehaviour
     private Vector3 _movementVector;
     private float _gravity;
     private float _currentSpeed;
-    private float _expectedSpeed;
+    // private float _expectedSpeed;
     //dash variables
     private bool _isDashing;
     private float _dashTimer;
@@ -30,6 +28,9 @@ public class PlayerMotor : MonoBehaviour
     public float Gravity { get { return _gravity; } }
     //movement
     public Vector3 FinalMoveVector { get { return CalculateFinalMoveVector(); } }
+    public float CurrentSpeed { get { return _currentSpeed; } }
+
+
 
     #endregion
     #region Updates
@@ -75,7 +76,6 @@ public class PlayerMotor : MonoBehaviour
     //public API
     public void SetGroundMovementInput(Vector2 input)
     {
-        // Debug.Log(_ctx?.GetType());
         Vector3 move = _ctx.Orientation.right * input.x + _ctx.Orientation.forward * input.y;
         move.y = 0f;
         _movementVector = move.normalized;
@@ -89,7 +89,7 @@ public class PlayerMotor : MonoBehaviour
         _movementVector = Vector3.MoveTowards(
             _movementVector,
             move,
-            _ctx.Variables.airMoveSpeed * _ctx.Variables.airControll * Time.deltaTime
+            _ctx.Variables.airMoveSpeed * _ctx.Variables.airControl * Time.deltaTime
         );
         _movementVector = Vector3.ClampMagnitude(_movementVector, _ctx.Variables.maxAirSpeed);
     }
@@ -112,7 +112,9 @@ public class PlayerMotor : MonoBehaviour
     {
         _currentSpeed = speed;
     }
-    public void SetJumpVelocity(float upWardForce)
+    /// <summary>Use to set Upward Force.(Jump, Launch, etc.)</summary>
+    /// <param name="upWardForce"></param>
+    public void SetUpwardVelocity(float upWardForce)
     {
         _verticalVelocity = upWardForce;
     }

@@ -9,7 +9,7 @@ public class PlayerGroundedState : PlayerBaseState
         CheckSwitchState();
         UpdateSubstate();
     }
-    public override void ExitState() { }
+    public override void ExitState() { Ctx.TimeLeftOnGround = Ctx.Variables.cyoteTime; }
     public override void CheckSwitchState()
     {
         if (Ctx.Input.IsJumpPressed && Ctx.Input.IsJumpPressedThisFrame)
