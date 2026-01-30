@@ -6,26 +6,48 @@ public class PlayerInputHandler : MonoBehaviour
     #region Private References
     //reference variables
     private PlayerInputActions _action;
+    //walk
     private Vector2 _currentMovementInput;
-    private Vector2 _currentLookInput;
     private bool _isMovementPressed;
+    //Look
+    private Vector2 _currentLookInput;
+    //sprint
     private bool _isSprintPressed;
     private bool _sprintToggle = false;
+    //jump
     private bool _isJumpPressedThisFrame;
     private bool _isJumpPressed;
+    //dash
     private bool _isDashPressedThisFrame;
     private bool _isDashPressed;
+    //Camera 
+    private bool _aimToggle = false;
+    //Attack
+    private bool _attackHeld;
+    private bool _attackPressed;
+
     #endregion
     #region Getters/Setters
+    //Walk
     public Vector2 CurrentMovementInput { get { return _currentMovementInput; } }
-    public Vector2 CurrentLookInput { get { return _currentLookInput; } }
     public bool IsMovementPressed { get { return _isMovementPressed; } }
+    //Sprint
     public bool IsSprintPressed { get { return _isSprintPressed; } }
     public bool SprintToggle { get { return _sprintToggle; } }
+    //Jump
     public bool IsJumpPressedThisFrame { get { return _isJumpPressedThisFrame; } }
     public bool IsJumpPressed { get { return _isJumpPressed; } }
+    //Dash
     public bool IsDashPressedThisFrame { get { return _isDashPressedThisFrame; } }
     public bool IsDashPressed { get { return _isDashPressed; } }
+    //Camera
+    public Vector2 CurrentLookInput { get { return _currentLookInput; } }
+    //Attack
+    public bool AttackHeld { get { return _attackHeld; } }
+    public bool AttackPressed { get { return _attackPressed; } }
+    //Attack -> Ranged
+    public bool IsAiming { get { return _attackHeld || _aimToggle; } }
+
     #endregion
     private void Awake()
     {
@@ -45,6 +67,12 @@ public class PlayerInputHandler : MonoBehaviour
 
         _action.Player.Look.performed += context => OnLook(context);
         _action.Player.Look.canceled += context => OnLook(context);
+
+        _action.Player.Attack.performed += context => OnAttack(context);
+        _action.Player.Attack.canceled += context => OnAttack(context);
+
+        _action.Player.AimMode.performed += context => OnAimEnabled(context);
+        _action.Player.AimMode.canceled += context => OnAimEnabled(context);
     }
 
     #region calback references
@@ -72,8 +100,28 @@ public class PlayerInputHandler : MonoBehaviour
             _isDashPressedThisFrame = true;
         _isDashPressed = context.ReadValueAsButton();
     }
+    void OnAttack(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            _attackPressed = true;
+        _attackHeld = context.ReadValueAsButton();
+    }
+    void OnAimEnabled(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            _aimToggle = !_aimToggle;
+        }
+    }
     #endregion
     //playerInput requirements
     public void OnEnable() { _action.Player.Enable(); }
     public void OnDisable() { _action.Player.Disable(); }
+
+    private void LateUpdate()
+    {
+        _isJumpPressedThisFrame = false;
+        _isDashPressedThisFrame = false;
+        _attackPressed = false;
+    }
 }

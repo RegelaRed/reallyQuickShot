@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 public abstract class PlayerBaseState
 {
     private bool _isRootState = false;
@@ -40,7 +38,7 @@ public abstract class PlayerBaseState
         if (IsRootState)
         {
             //switch current state context
-            _ctx.CurrentState = newState;
+            _ctx.CurrentMovementState = newState;
         }
         else if (_currentSuperState != null)
         {

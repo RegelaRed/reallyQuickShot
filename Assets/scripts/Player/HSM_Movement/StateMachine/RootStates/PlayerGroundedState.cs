@@ -18,7 +18,7 @@ public class PlayerGroundedState : PlayerBaseState
         }
         else if (Ctx.CanDash && Ctx.Input.IsDashPressedThisFrame)
         {
-            Ctx.DashTime = Ctx.Variables.dashRegenTime;
+            Ctx.DashConsume();
             SwitchStates(Factory.Dash());
         }
         else if (!Ctx.IsOnGround)

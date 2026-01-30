@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
@@ -15,23 +14,25 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerVariables _playerVariables;
 
     //script references
-    private PlayerInputHandler _input;
-    private PlayerBaseState _currentState;
-    private PlayerStateFactory _factory;
-    private PlayerMotor _playerMotor;
+    [SerializeField] private PlayerInputHandler _input;
+    private PlayerBaseState _currentMovementState;
+    private PlayerStateFactory _movementFactory;
+
+    private PlayerCameraBaseState _currentCameraState;
+    private PlayerCameraStateFactory _cameraFactory;
+
+    [SerializeField] private PlayerMotor _playerMotor;
 
     //runtime jump references
-    private bool _isJumping;
     private float _timeLeftOnGround;
     private float _initialJumpVelocity;
     private float _jumpGravity;
 
-    //dash variables
-    private float _dashTimer;
-    public Coroutine RunCoroutine(IEnumerator routine)
-    {
-        return StartCoroutine(routine);
-    }
+    //dash
+    private float _dashIntervalTimer;
+    private float _dashRegenTimer;
+    private int _currentDashCharges;
+
     #endregion
     #region Getters/Setters
     //SerialisedField Setters
@@ -45,18 +46,19 @@ public class PlayerController : MonoBehaviour
 
     //Script References
     public PlayerInputHandler Input { get { return _input; } }
-    public PlayerBaseState CurrentState { get { return _currentState; } set { _currentState = value; } }
+    public PlayerBaseState CurrentMovementState { get { return _currentMovementState; } set { _currentMovementState = value; } }
+    public PlayerCameraBaseState CurrentCameraState { get { return _currentCameraState; } set { _currentCameraState = value; } }
     public PlayerMotor PlayerMotor { get { return _playerMotor; } }
 
     //Jump
-    public bool IsJumping { get { return _isJumping; } set { _isJumping = value; } }
     public float InitialJumpVelocity { get { return _initialJumpVelocity; } }
     public float TimeLeftOnGround { get { return _timeLeftOnGround; } set { _timeLeftOnGround = value; } }
     public float JumpGravity { get { return _jumpGravity; } }
 
     //dash
-    public float DashTime { set { _dashTimer = value; } }
-    public bool CanDash { get { return _dashTimer <= 0; } }
+    public float DashCooldownTimer { get { return _dashIntervalTimer; } set { _dashIntervalTimer = value; } }
+    public int AvalableDashCharges { get { return _currentDashCharges; } }
+    public bool CanDash { get { return _dashIntervalTimer <= 0f && _currentDashCharges > 0; } }
 
     //Ground
     public bool IsOnGround { get { return Controller.isGrounded; } }
@@ -65,36 +67,36 @@ public class PlayerController : MonoBehaviour
     //updatemethods
     private void Awake()
     {
-        _input = GetComponent<PlayerInputHandler>();
-        _playerMotor = GetComponent<PlayerMotor>();
-        _factory = new PlayerStateFactory(this);
-        _currentState = _factory.Grounded();
-        _currentState.EnterState();
-
+        HideMouse();
+        //Input and Motor
+        if (_input == null)
+            _input = GetComponent<PlayerInputHandler>();
+        if (_playerMotor == null)
+            _playerMotor = GetComponent<PlayerMotor>();
+        //Movement SM
+        _movementFactory = new PlayerStateFactory(this);
+        _currentMovementState = _movementFactory.Grounded();
+        _currentMovementState.EnterState();
+        //Camera SM
+        _cameraFactory = new PlayerCameraStateFactory(this);
+        _currentCameraState = _cameraFactory.MainCamera();
+        _currentCameraState.EnterState();
+        //jump
         SetupJumpVariables();
+        //dash
+        _currentDashCharges = _playerVariables.maxDashCharges;
     }
-    //tempdebug variables
-    PlayerBaseState lastState;
-    PlayerBaseState lastSubState;
+
     private void Update()
     {
-        if (_dashTimer > 0f)
-            _dashTimer -= Time.deltaTime;
+        DashIntervalTimer();
+        DashRegenen();
 
-
-        _currentState.UpdateStates();
+        //State Updates
+        _currentMovementState.UpdateStates();
         _playerMotor.UpdatePhysics();
 
-        if (lastState != _currentState)
-        {
-            Debug.Log("Current Superstate" + _currentState?.GetType().Name);
-            lastState = _currentState;
-        }
-        if (lastSubState != _currentState.CurrentSubState)
-        {
-            Debug.Log("Current SubState" + _currentState.CurrentSubState?.GetType().Name);
-            lastSubState = _currentState.CurrentSubState;
-        }
+        _currentCameraState?.UpdateStates();
     }
 
     //Helper Functions
@@ -104,5 +106,40 @@ public class PlayerController : MonoBehaviour
         _jumpGravity = -2 * _playerVariables.maxJumpHeight / Mathf.Pow(_timeToApex, 2);
         _initialJumpVelocity = 2 * _playerVariables.maxJumpHeight / _timeToApex;
     }
+    public void DashConsume()
+    {
+        _currentDashCharges--;
+        _dashIntervalTimer = Variables.dashInterval;
+        _dashRegenTimer = Variables.dashRegenTime;
+    }
+    public void DashIntervalTimer()
+    {
+        if (_dashIntervalTimer > 0f)
+        {
+            _dashIntervalTimer -= Time.deltaTime;
+        }
+    }
+    public void DashRegenen()
+    {
+        if (_currentDashCharges >= Variables.maxDashCharges) return;
 
+        if (_dashRegenTimer > 0)
+        {
+            _dashRegenTimer -= Time.deltaTime;
+            return;
+        }
+        _currentDashCharges += 1;
+        _currentDashCharges = Mathf.Min(_currentDashCharges, _playerVariables.maxDashCharges);
+        _dashRegenTimer = _playerVariables.dashRegenTime;
+    }
+    public void HideMouse()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+    public void UnHideMouse()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
 }
