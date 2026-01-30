@@ -13,7 +13,6 @@ public class PlayerJumpState : PlayerBaseState
     {
         CheckSwitchState();
         UpdateSubstate();
-        Ctx.PlayerMotor.SetMovementInput(Ctx.Input.CurrentMovementInput);
     }
     public override void ExitState()
     {
@@ -24,6 +23,11 @@ public class PlayerJumpState : PlayerBaseState
         if (Ctx.IsOnGround)
         {
             SwitchStates(Factory.Grounded());
+        }
+        else if (Ctx.CanDash && Ctx.Input.IsDashPressedThisFrame)
+        {
+            Ctx.DashConsume();
+            SwitchStates(Factory.Dash());
         }
     }
     public override void InitializeSubState()

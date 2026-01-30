@@ -4,7 +4,7 @@ public class PlayerMainCamera : PlayerCameraBaseState
     public PlayerMainCamera(PlayerController _ctx, PlayerCameraStateFactory _factory)
     : base(_ctx, _factory)
     {
-        SetSensitivity(Ctx.Variables.verticalCameraSensitivity, Ctx.Variables.horizontalCameraSensitivity);
+        SetSensitivity(Ctx.Variables.horizontalCameraSensitivity, Ctx.Variables.verticalCameraSensitivity);
         SetPitchLimits(Ctx.Variables.mainCameraPitchMin, Ctx.Variables.mainCameraPitchMax);
     }
     public override void EnterState() { Ctx.MainCamera.SetActive(true); }

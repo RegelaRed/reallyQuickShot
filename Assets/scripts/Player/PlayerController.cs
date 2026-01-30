@@ -97,6 +97,9 @@ public class PlayerController : MonoBehaviour
         _playerMotor.UpdatePhysics();
 
         _currentCameraState?.UpdateStates();
+
+        // Debug.Log("Current state " + CurrentMovementState + " " + "Current Sub state" + CurrentMovementState.CurrentSubState);
+        // Debug.Log("Current camera state" + CurrentCameraState);
     }
 
     //Helper Functions

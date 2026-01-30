@@ -13,11 +13,11 @@ public abstract class PlayerCameraBaseState
     private float _yaw;
     private float _minPitch;
     private float _maxPitch;
-    private float _sensX = 50f;
-    private float _sensY = 50f;
+    private float _sensX;
+    private float _sensY;
 
     //Getter/Setters
-    public bool IsRootSate { get { return _isRootState; } set { _isRootState = value; } }
+    public bool IsRootState { get { return _isRootState; } set { _isRootState = value; } }
     public PlayerController Ctx { get { return _ctx; } }
     public PlayerCameraStateFactory Factory { get { return _factory; } }
     public PlayerCameraBaseState CurrentSuperState { get { return _currentSuperState; } }
@@ -45,7 +45,7 @@ public abstract class PlayerCameraBaseState
         ExitState();
         newState.EnterState();
 
-        if (IsRootSate)
+        if (IsRootState)
         {
             Ctx.CurrentCameraState = newState;
         }

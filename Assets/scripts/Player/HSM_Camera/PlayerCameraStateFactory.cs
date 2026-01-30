@@ -7,13 +7,13 @@ public class PlayerCameraStateFactory
     public PlayerCameraBaseState MainCamera()
     {
         PlayerCameraBaseState state = new PlayerMainCamera(_ctx, this);
-        state.IsRootSate = true;
+        state.IsRootState = true;
         return state;
     }
     public PlayerCameraBaseState AimCamera()
     {
         PlayerCameraBaseState state = new PlayerAimCamera(_ctx, this);
-        state.IsRootSate = true;
+        state.IsRootState = true;
         return state;
     }
 }

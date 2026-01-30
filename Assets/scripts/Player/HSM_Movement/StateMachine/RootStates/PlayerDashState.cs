@@ -5,7 +5,10 @@ public class PlayerDashState : PlayerBaseState
 
     public override void EnterState()
     {
-        Ctx.PlayerMotor.StartDash(Ctx.Orientation.forward, Ctx.Variables.dashDistance, Ctx.Variables.dashDuration);
+        if (Ctx.Input.IsAiming)
+            Ctx.PlayerMotor.StartDash(Ctx.Variables.dashDistance, Ctx.Variables.dashDuration, Ctx.Orientation.forward);
+        else
+            Ctx.PlayerMotor.StartDash(Ctx.Variables.dashDistance, Ctx.Variables.dashDuration, Ctx.FaceDirection.forward);
     }
     public override void UpdateState() { CheckSwitchState(); }
     public override void ExitState() { }

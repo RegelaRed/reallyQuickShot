@@ -7,7 +7,7 @@ public class PlayerFallingState : PlayerBaseState
     public override void EnterState()
     {
         Ctx.PlayerMotor.SetGravity(Ctx.Variables.gravity);
-        Ctx.PlayerMotor.SetSpeed(Ctx.Variables.airMoveSpeed);
+        Ctx.PlayerMotor.SetAirMovementInput(Ctx.Input.CurrentMovementInput);
     }
     public override void UpdateState() { CheckSwitchState(); }
     public override void ExitState() { }
@@ -16,7 +16,7 @@ public class PlayerFallingState : PlayerBaseState
         Ctx.TimeLeftOnGround += Time.deltaTime;
         if (Ctx.IsOnGround)
             SwitchStates(Factory.Grounded());
-        if (Ctx.Input.IsJumpPressed && Ctx.TimeLeftOnGround <= Ctx.Variables.cyoteTime)
+        if (Ctx.Input.IsJumpPressed && Ctx.TimeLeftOnGround <= Ctx.Variables.cyoteTime && Ctx.IsOnGround)
             SwitchStates(Factory.Jump());
     }
     public override void InitializeSubState()

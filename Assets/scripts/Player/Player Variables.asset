@@ -24,10 +24,12 @@ MonoBehaviour:
   dashDistance: 4
   gravity: -10
   airMoveSpeed: 0.2
-  playerBodyRotationSpeed: 2
+  maxAirSpeed: 2
+  airControll: 20
+  playerBodyRotationSpeed: 0.1
   horizontalCameraSensitivity: 50
   verticalCameraSensitivity: 50
   mainCameraPitchMin: -60
   mainCameraPitchMax: 30
-  aimCameraPitchMin: -80
-  aimCameraPitchMax: 70
+  aimCameraPitchMin: -50
+  aimCameraPitchMax: 80
