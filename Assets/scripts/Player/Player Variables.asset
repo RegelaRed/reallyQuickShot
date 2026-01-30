@@ -26,7 +26,7 @@ MonoBehaviour:
   airMoveSpeed: 0.2
   maxAirSpeed: 2
   airControll: 20
-  playerBodyRotationSpeed: 0.1
+  playerBodyRotationSpeed: 0.05
   horizontalCameraSensitivity: 50
   verticalCameraSensitivity: 50
   mainCameraPitchMin: -60

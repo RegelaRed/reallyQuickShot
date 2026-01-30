@@ -11,6 +11,7 @@ public class PlayerJumpState : PlayerBaseState
     }
     public override void UpdateState()
     {
+        Ctx.PlayerMotor.SetAirMovementInput(Ctx.Input.CurrentMovementInput);
         CheckSwitchState();
         UpdateSubstate();
     }
