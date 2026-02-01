@@ -74,8 +74,10 @@ public class PlayerMotor : MonoBehaviour
     }
 
     //public API
-    public void SetGroundMovementInput(Vector2 input)
+    public void SetGroundMovementInput(Vector2 input, float speed)
     {
+        _currentSpeed = SetBaseSpeed(speed);
+        
         Vector3 move = _ctx.Orientation.right * input.x + _ctx.Orientation.forward * input.y;
         move.y = 0f;
         _movementVector = move.normalized;
@@ -93,7 +95,12 @@ public class PlayerMotor : MonoBehaviour
         );
         _movementVector = Vector3.ClampMagnitude(_movementVector, _ctx.Variables.maxAirSpeed);
     }
-
+    private float SetBaseSpeed(float baseSpeed)
+    {
+        if (_ctx.Input.AttackHeld)
+            return _ctx.Variables.aimModeSpeed;
+        return baseSpeed;
+    }
     //Dash
     private void DashReset()
     {

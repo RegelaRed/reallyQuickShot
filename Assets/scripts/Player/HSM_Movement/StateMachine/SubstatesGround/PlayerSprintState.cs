@@ -6,7 +6,7 @@ public class PlayerSprintState : PlayerBaseState
     public override void UpdateState()
     {
         CheckSwitchState();
-        Ctx.PlayerMotor.SetGroundMovementInput(Ctx.Input.CurrentMovementInput);
+        Ctx.PlayerMotor.SetGroundMovementInput(Ctx.Input.CurrentMovementInput, Ctx.Variables.sprintSpeed);
     }
     public override void ExitState() { }
     public override void CheckSwitchState() { }

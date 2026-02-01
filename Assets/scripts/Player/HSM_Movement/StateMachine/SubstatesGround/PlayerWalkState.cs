@@ -2,11 +2,14 @@ public class PlayerWalkState : PlayerBaseState
 {
     public PlayerWalkState(PlayerController _ctx, PlayerStateFactory _factory)
     : base(_ctx, _factory) { }
-    public override void EnterState() { Ctx.PlayerMotor.SetSpeed(Ctx.Variables.walkSpeed); }
+    public override void EnterState()
+    {
+        Ctx.PlayerMotor.SetSpeed(Ctx.Variables.walkSpeed);
+    }
     public override void UpdateState()
     {
         CheckSwitchState();
-        Ctx.PlayerMotor.SetGroundMovementInput(Ctx.Input.CurrentMovementInput);
+        Ctx.PlayerMotor.SetGroundMovementInput(Ctx.Input.CurrentMovementInput, Ctx.Variables.walkSpeed);
     }
     public override void ExitState() { }
     public override void CheckSwitchState() { }

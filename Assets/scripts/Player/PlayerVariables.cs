@@ -45,4 +45,7 @@ public class PlayerVariables : ScriptableObject
     public float aimCameraPitchMin = -80f;
     [Tooltip("maximum value to look up, place between 0 to 90")]
     public float aimCameraPitchMax = 70f;
+
+    [Header("Aim Mode")]
+    public float aimModeSpeed = 4f;
 }
