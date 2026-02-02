@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
@@ -35,6 +36,10 @@ public class PlayerController : MonoBehaviour
     private float _initialDashVelocity;
     private float _dashGravity;
 
+    public Coroutine RunCorutine(IEnumerator routine)
+    {
+        return base.StartCoroutine(routine);
+    }
     #endregion
     #region Getters/Setters
     //SerialisedField Setters
@@ -87,39 +92,40 @@ public class PlayerController : MonoBehaviour
         _currentCameraState = _cameraFactory.MainCamera();
         _currentCameraState.EnterState();
         //jump
-        SetupJumpVariables();
+        Jump_SetupVariables();
         //dash
-        SetupDashVariales();
-        _currentDashCharges = _playerVariables.maxDashCharges;
+        Dash_SetupVariale();
     }
 
     private void Update()
     {
         CyoteTimer();
-        DashIntervalTimer();
+        Dash_IntervalTimer();
         DashRegenen();
 
         //State Updates
         _currentMovementState.UpdateStates();
         _playerMotor.UpdatePhysics();
-
-        _currentCameraState?.UpdateStates();
+        _currentCameraState.UpdateStates();
     }
 
     //Helper Functions
+    //jump
     private void CyoteTimer()
     {
         if (_cyoteTimer > 0)
             _cyoteTimer -= Time.deltaTime;
     }
-    private void SetupJumpVariables()
+    private void Jump_SetupVariables()
     {
         float _timeToApex = _playerVariables.maxJumpTime / 2;
         _jumpGravity = -2 * _playerVariables.maxJumpHeight / Mathf.Pow(_timeToApex, 2);
         _initialJumpVelocity = 2 * _playerVariables.maxJumpHeight / _timeToApex;
     }
-    private void SetupDashVariales()
+    //dash
+    private void Dash_SetupVariale()
     {
+        _currentDashCharges = _playerVariables.maxDashCharges;
         float _timeToApex = Variables.dashDuration / 2;
         _dashGravity = -2 * _playerVariables.samllDashJumpHeight / Mathf.Pow(_timeToApex, 2);
         _initialDashVelocity = 2 * Variables.samllDashJumpHeight / _timeToApex;
@@ -130,12 +136,11 @@ public class PlayerController : MonoBehaviour
         _dashIntervalTimer = Variables.dashInterval;
         _dashRegenTimer = Variables.dashRegenTime;
     }
-    public void DashIntervalTimer()
+    public void Dash_IntervalTimer()
     {
         if (_dashIntervalTimer > 0f)
-        {
             _dashIntervalTimer -= Time.deltaTime;
-        }
+
     }
     public void DashRegenen()
     {
@@ -155,7 +160,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-    public void UnHideMouse()
+    public void UnhideMouse()
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;

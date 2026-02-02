@@ -2,11 +2,7 @@
 public class PlayerStateFactory
 {
     PlayerController _ctx;
-    public PlayerStateFactory(PlayerController _currentContext)
-    {
-        _ctx = _currentContext;
-    }
-
+    public PlayerStateFactory(PlayerController _currentContext) { _ctx = _currentContext; }
     //Root States
     public PlayerBaseState Grounded()
     {

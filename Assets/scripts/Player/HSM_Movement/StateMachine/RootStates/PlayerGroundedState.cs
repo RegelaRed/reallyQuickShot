@@ -1,15 +1,16 @@
+using Unity.VisualScripting;
+
 public class PlayerGroundedState : PlayerBaseState
 {
-    public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory)
-    : base(_ctx, _factory)
+    public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory) : base(_ctx, _factory)
     { _ctx.PlayerMotor.SetGravity(_ctx.Variables.gravity); }
     public override void EnterState() { InitializeSubState(); }
+    public override void ExitState() { Ctx.TimeLeftOnGround = Ctx.Variables.cyoteTime; }
     public override void UpdateState()
     {
         CheckSwitchState();
         UpdateSubstate();
     }
-    public override void ExitState() { Ctx.TimeLeftOnGround = Ctx.Variables.cyoteTime; }
     public override void CheckSwitchState()
     {
         if (Ctx.Input.IsJumpPressed && Ctx.Input.IsJumpPressedThisFrame)
@@ -32,13 +33,12 @@ public class PlayerGroundedState : PlayerBaseState
         PlayerBaseState desiredState = GetDesiredState();
         if (CurrentSubState?.GetType() != desiredState?.GetType())
         {
-            CurrentSubState.ExitState();
             SetSubState(desiredState);
         }
+
     }
     private PlayerBaseState GetDesiredState()
     {
-
         if (Ctx.Input.IsMovementPressed && Ctx.Input.SprintToggle)
             return Factory.Sprint();
         else if (Ctx.Input.IsMovementPressed)

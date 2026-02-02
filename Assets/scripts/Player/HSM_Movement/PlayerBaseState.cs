@@ -1,3 +1,6 @@
+using TMPro;
+using UnityEngine;
+
 public abstract class PlayerBaseState
 {
     private bool _isRootState = false;
@@ -18,20 +21,16 @@ public abstract class PlayerBaseState
         _factory = stateFactory;
     }
 
-    /// <summary>Set Enter animator or one time trigger logic into this</summary>
     public abstract void EnterState();
-    /// <summary>Update Parent state(Root State)</summary>
-    public abstract void UpdateState();
-    /// <summary>Set Exit animator or one time trigger logic into this</summary>
     public abstract void ExitState();
-    /// <summary>Switch SuperStates</summary>
+    public abstract void UpdateState();
     public abstract void CheckSwitchState();
     public abstract void InitializeSubState();
-    /// <summary>Switch RootState/Switch Substate and keep SuperState</summary>
     protected void SwitchStates(PlayerBaseState newState)
     {
         //current state exit
         ExitState();
+
         //new state enter
         newState.EnterState();
 
@@ -41,18 +40,17 @@ public abstract class PlayerBaseState
             _ctx.CurrentMovementState = newState;
         }
         else if (_currentSuperState != null)
-        {
             _currentSuperState.SetSubState(newState);
-        }
+
     }
     /// <summary>Update SubstatesStates if any</summary>
     public void UpdateStates()
     {
         UpdateState();
         if (_currentSubState != null)
-        {
             _currentSubState.UpdateStates();
-        }
+
+        Debug.Log($"Superstate = {_currentSuperState}, Substate = {_currentSubState}");
     }
     /// <summary>Exit All SubStates if any</summary>
     public void ExitStates()

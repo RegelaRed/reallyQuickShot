@@ -7,28 +7,28 @@ public class PlayerMotor : MonoBehaviour
     [SerializeField] private PlayerController _ctx;
 
     // Movement state
-    private float _verticalVelocity;
-
-    private Vector3 _movementVector;
+    private float _verticalFloat;
+    private Vector3 _horizontalVelocity;
     private float _gravity;
     private float _currentSpeed;
-    // private float _expectedSpeed;
     //dash variables
     private bool _isDashing;
     private float _dashTimer;
 
     //Getters and Setters
+
     //dash
-    public bool IsDashing { get { return _isDashing; } set { _isDashing = value; } }
-    public float DashTime { get { return _dashTimer; } set { _dashTimer = value; } }
+    public bool IsDashing { get { return _isDashing; } }
+    public float DashTime { get { return _dashTimer; } }
     public bool CanDash { get { return _dashTimer <= 0; } }
     //Upward force
-    public float VerticalVelocity { get { return _verticalVelocity; } }
+    public float VerticalVelocity { get { return _verticalFloat; } }
     //gravity
     public float Gravity { get { return _gravity; } }
     //movement
     public Vector3 FinalMoveVector { get { return CalculateFinalMoveVector(); } }
     public float CurrentSpeed { get { return _currentSpeed; } }
+    public Vector3 CurrentMovementVector { get { return _horizontalVelocity; } }
 
 
 
@@ -45,9 +45,7 @@ public class PlayerMotor : MonoBehaviour
     {
         DashReset();
         ApplyGravity();
-        Vector3 finalVelocity = CalculateFinalMoveVector();
-
-        _ctx.Controller.Move(finalVelocity * Time.deltaTime);
+        _ctx.Controller.Move(CalculateFinalMoveVector() * Time.deltaTime);
     }
 
     #endregion
@@ -55,60 +53,50 @@ public class PlayerMotor : MonoBehaviour
     /// Helper functions
     private void ApplyGravity()
     {
-        if (_ctx.IsOnGround && _verticalVelocity < 0f)
+        if (_ctx.IsOnGround && _verticalFloat < 0f)
         {
             // small downward force to stay grounded
-            _verticalVelocity = -2f;
+            _verticalFloat = -2f;
             return;
         }
-        _verticalVelocity += Gravity * Time.deltaTime;
+        _verticalFloat += _gravity * Time.deltaTime;
     }
     public Vector3 CalculateFinalMoveVector()
     {
-        Vector3 horizontal;
-        if (IsDashing)
-            horizontal = _ctx.Orientation.forward * _currentSpeed;
-        else
-            horizontal = _movementVector * _currentSpeed;
-        return horizontal + Vector3.up * _verticalVelocity;
+        Vector3 horizontal = _horizontalVelocity * _currentSpeed;
+        return (horizontal * _currentSpeed) + (Vector3.up * _verticalFloat);
     }
-
-    //public API
+    #endregion
+    #region public API
     public void SetGroundMovementInput(Vector2 input, float speed)
     {
-        _currentSpeed = SetBaseSpeed(speed);
-        
+        _currentSpeed = CheckAimModeSpeed(speed);
+
         Vector3 move = _ctx.Orientation.right * input.x + _ctx.Orientation.forward * input.y;
         move.y = 0f;
-        _movementVector = move.normalized;
+
+        _horizontalVelocity = move;
     }
     public void SetAirMovementInput(Vector2 input)
     {
         Vector3 move = _ctx.Orientation.right * input.x + _ctx.Orientation.forward * input.y;
         move.y = 0f;
-        move = move.normalized;
-
-        _movementVector = Vector3.MoveTowards(
-            _movementVector,
-            move,
+        
+        _horizontalVelocity = Vector3.MoveTowards(
+            _horizontalVelocity, move,
             _ctx.Variables.airMoveSpeed * _ctx.Variables.airControl * Time.deltaTime
         );
-        _movementVector = Vector3.ClampMagnitude(_movementVector, _ctx.Variables.maxAirSpeed);
+        _horizontalVelocity = Vector3.ClampMagnitude(_horizontalVelocity, _ctx.Variables.maxAirSpeed);
     }
-    private float SetBaseSpeed(float baseSpeed)
-    {
-        if (_ctx.Input.AttackHeld)
-            return _ctx.Variables.aimModeSpeed;
-        return baseSpeed;
-    }
+
     //Dash
-    private void DashReset()
+    public void StartDash(float distance, float duration, Vector3 direction)
     {
-        if (_isDashing)
-        {
-            _dashTimer -= Time.deltaTime;
-            if (_dashTimer <= 0f) { _isDashing = false; _currentSpeed = 0f; }
-        }
+        _horizontalVelocity = Vector3.zero;
+        _isDashing = true;
+        _dashTimer = duration;
+        _currentSpeed = distance / duration;
+        _horizontalVelocity = direction;
     }
     //set variables
     public void SetGravity(float gravity)
@@ -119,18 +107,30 @@ public class PlayerMotor : MonoBehaviour
     {
         _currentSpeed = speed;
     }
-    /// <summary>Use to set Upward Force.(Jump, Launch, etc.)</summary>
-    /// <param name="upWardForce"></param>
     public void SetUpwardVelocity(float upWardForce)
     {
-        _verticalVelocity = upWardForce;
+        _verticalFloat = upWardForce;
     }
-    public void StartDash(float distance, float duration, Vector3 direction)
+    #endregion
+    #region Private Fuctions
+    private float CheckAimModeSpeed(float baseSpeed)
     {
-        IsDashing = true;
-        DashTime = duration;
-        _currentSpeed = distance / duration;
-        _movementVector = direction;
+        if (_ctx.Input.AttackHeld)
+            return _ctx.Variables.aimModeSpeed;
+        return baseSpeed;
+    }
+    private void DashReset()
+    {
+        if (_isDashing)
+            return;
+
+        if (_dashTimer > 0f)
+        {
+            _dashTimer -= Time.deltaTime;
+            return;
+        }
+        _isDashing = false;
+        _currentSpeed = 0f;
     }
     #endregion
 }

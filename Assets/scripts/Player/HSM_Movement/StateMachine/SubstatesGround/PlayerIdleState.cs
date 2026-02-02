@@ -8,7 +8,7 @@ public class PlayerIdleState : PlayerBaseState
     {
         Ctx.PlayerMotor.SetGroundMovementInput(Vector2.zero, 0f);
     }
-    public override void UpdateState() { CheckSwitchState(); }
+    public override void UpdateState() { }
     public override void ExitState() { }
     public override void CheckSwitchState() { }
     public override void InitializeSubState() { }

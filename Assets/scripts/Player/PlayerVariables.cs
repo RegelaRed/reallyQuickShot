@@ -10,6 +10,7 @@ public class PlayerVariables : ScriptableObject
     [Header("Jump")]
     public float maxJumpHeight = 1.4f;
     public float maxJumpTime = 0.5f;
+    public float jumpCutMultiplier = 0.5f;
     public float cyoteTime = 0.4f;
 
     [Header("Dash")]
@@ -33,14 +34,14 @@ public class PlayerVariables : ScriptableObject
     public float playerBodyRotationSpeed = 5f;
     public float horizontalCameraSensitivity = 50f;
     public float verticalCameraSensitivity = 50f;
+    
     [Header("Main Camera")]
-
     [Tooltip("minimum value to look down, place between 0 to (-90)")]
     public float mainCameraPitchMin = -60f;
     [Tooltip("maximum value to look up, place between 0 to 90")]
     public float mainCameraPitchMax = 30f;
+  
     [Header("Aim Camera")]
-
     [Tooltip("minimum value to look down, place between 0 to (-90)")]
     public float aimCameraPitchMin = -80f;
     [Tooltip("maximum value to look up, place between 0 to 90")]
