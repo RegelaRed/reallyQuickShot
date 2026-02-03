@@ -41,7 +41,6 @@ public abstract class PlayerBaseState
         }
         else if (_currentSuperState != null)
             _currentSuperState.SetSubState(newState);
-
     }
     /// <summary>Update SubstatesStates if any</summary>
     public void UpdateStates()
@@ -49,8 +48,6 @@ public abstract class PlayerBaseState
         UpdateState();
         if (_currentSubState != null)
             _currentSubState.UpdateStates();
-
-        Debug.Log($"Superstate = {_currentSuperState}, Substate = {_currentSubState}");
     }
     /// <summary>Exit All SubStates if any</summary>
     public void ExitStates()

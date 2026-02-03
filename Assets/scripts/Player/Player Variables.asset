@@ -17,11 +17,11 @@ MonoBehaviour:
   maxJumpHeight: 1.4
   maxJumpTime: 0.8
   jumpCutMultiplier: 0.2
-  cyoteTime: 0.6
+  cyoteTime: 0.4
   maxDashCharges: 2
   dashInterval: 0.2
   dashRegenTime: 0.3
-  dashDuration: 0.3
+  dashDuration: 0.6
   dashDistance: 4
   samllDashJumpHeight: 0.8
   gravity: -10
@@ -32,7 +32,7 @@ MonoBehaviour:
   horizontalCameraSensitivity: 50
   verticalCameraSensitivity: 50
   mainCameraPitchMin: -60
-  mainCameraPitchMax: 30
+  mainCameraPitchMax: 20
   aimCameraPitchMin: -50
   aimCameraPitchMax: 80
   aimModeSpeed: 4

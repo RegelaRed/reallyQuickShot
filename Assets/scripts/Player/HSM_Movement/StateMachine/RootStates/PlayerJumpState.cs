@@ -13,12 +13,8 @@ public class PlayerJumpState : PlayerBaseState
         _jumpExitTimer = Ctx.Variables.maxJumpTime;
         Ctx.PlayerMotor.SetGravity(Ctx.JumpGravity);
         if (Ctx.PlayerMotor.CurrentSpeed <= 0f)
-        {
-            if (Ctx.Input.SprintToggle)
-                Ctx.PlayerMotor.SetSpeed(Ctx.Variables.sprintSpeed);
-            else
-                Ctx.PlayerMotor.SetSpeed(Ctx.Variables.walkSpeed);
-        }
+            Ctx.PlayerMotor.SetSpeed(
+                Ctx.Input.SprintToggle ? Ctx.Variables.sprintSpeed : Ctx.Variables.walkSpeed);
 
         Ctx.PlayerMotor.SetUpwardVelocity(Ctx.InitialJumpVelocity);
 

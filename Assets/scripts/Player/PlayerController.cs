@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private PlayerCameraBaseState _currentCameraState;
     private PlayerCameraStateFactory _cameraFactory;
 
+    
     [SerializeField] private PlayerMotor _playerMotor;
 
     //runtime jump references
@@ -55,6 +56,7 @@ public class PlayerController : MonoBehaviour
     public PlayerInputHandler Input { get { return _input; } }
     public PlayerBaseState CurrentMovementState { get { return _currentMovementState; } set { _currentMovementState = value; } }
     public PlayerCameraBaseState CurrentCameraState { get { return _currentCameraState; } set { _currentCameraState = value; } }
+    
     public PlayerMotor PlayerMotor { get { return _playerMotor; } }
 
     //Jump

@@ -1,3 +1,5 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMotor : MonoBehaviour
@@ -50,7 +52,6 @@ public class PlayerMotor : MonoBehaviour
 
     #endregion
     #region Calculations
-    /// Helper functions
     private void ApplyGravity()
     {
         if (_ctx.IsOnGround && _verticalFloat < 0f)
@@ -63,32 +64,32 @@ public class PlayerMotor : MonoBehaviour
     }
     public Vector3 CalculateFinalMoveVector()
     {
-        Vector3 horizontal = _horizontalVelocity * _currentSpeed;
-        return (horizontal * _currentSpeed) + (Vector3.up * _verticalFloat);
+        return (_horizontalVelocity * _currentSpeed) + (Vector3.up * _verticalFloat);
     }
+
     #endregion
     #region public API
-    public void SetGroundMovementInput(Vector2 input, float speed)
+    public void SetGroundMovementInput(Vector2 input)
     {
-        _currentSpeed = CheckAimModeSpeed(speed);
-
-        Vector3 move = _ctx.Orientation.right * input.x + _ctx.Orientation.forward * input.y;
-        move.y = 0f;
-
-        _horizontalVelocity = move;
+        _horizontalVelocity = NormalizedInput(input);
     }
     public void SetAirMovementInput(Vector2 input)
     {
-        Vector3 move = _ctx.Orientation.right * input.x + _ctx.Orientation.forward * input.y;
-        move.y = 0f;
-        
+        Vector3 move = NormalizedInput(input);
+
         _horizontalVelocity = Vector3.MoveTowards(
             _horizontalVelocity, move,
             _ctx.Variables.airMoveSpeed * _ctx.Variables.airControl * Time.deltaTime
         );
         _horizontalVelocity = Vector3.ClampMagnitude(_horizontalVelocity, _ctx.Variables.maxAirSpeed);
     }
+    private Vector3 NormalizedInput(Vector2 input)
+    {
+        Vector3 move = _ctx.Orientation.right * input.x + _ctx.Orientation.forward * input.y;
+        move.y = 0f;
 
+        return move.normalized;
+    }
     //Dash
     public void StartDash(float distance, float duration, Vector3 direction)
     {
@@ -96,7 +97,7 @@ public class PlayerMotor : MonoBehaviour
         _isDashing = true;
         _dashTimer = duration;
         _currentSpeed = distance / duration;
-        _horizontalVelocity = direction;
+        _horizontalVelocity = direction.normalized;
     }
     //set variables
     public void SetGravity(float gravity)
@@ -111,17 +112,16 @@ public class PlayerMotor : MonoBehaviour
     {
         _verticalFloat = upWardForce;
     }
-    #endregion
-    #region Private Fuctions
-    private float CheckAimModeSpeed(float baseSpeed)
+    public void CheckAimModeSpeed(float baseSpeed)
     {
         if (_ctx.Input.AttackHeld)
-            return _ctx.Variables.aimModeSpeed;
-        return baseSpeed;
+            _currentSpeed = _ctx.Variables.aimModeSpeed;
+        else
+            _currentSpeed = baseSpeed;
     }
     private void DashReset()
     {
-        if (_isDashing)
+        if (!_isDashing)
             return;
 
         if (_dashTimer > 0f)

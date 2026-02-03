@@ -6,7 +6,7 @@ public class PlayerIdleState : PlayerBaseState
     : base(_ctx, _factory) { }
     public override void EnterState()
     {
-        Ctx.PlayerMotor.SetGroundMovementInput(Vector2.zero, 0f);
+        Ctx.PlayerMotor.SetGroundMovementInput(Vector2.zero);
     }
     public override void UpdateState() { }
     public override void ExitState() { }
