@@ -12,17 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03ec9882e18f81540824b64b07271d9e, type: 3}
   m_Name: Player Variables
   m_EditorClassIdentifier: 
-  walkSpeed: 5
-  sprintSpeed: 8
-  jumpForce: 4
-  dashForce: 28
+  walkSpeed: 8
+  sprintSpeed: 12
+  maxJumpHeight: 1.4
+  maxJumpTime: 0.8
+  jumpCutMultiplier: 0.2
+  cyoteTime: 0.4
   maxDashCharges: 2
-  dashRegenTime: 1
-  dashDuration: 0.4
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
+  dashInterval: 0.2
+  dashRegenTime: 0.3
+  dashDuration: 0.6
+  dashDistance: 4
+  samllDashJumpHeight: 0.8
+  gravity: -10
+  airMoveSpeed: 0.2
+  maxAirSpeed: 2
+  airControl: 18
+  playerBodyRotationSpeed: 0.09
   horizontalCameraSensitivity: 50
   verticalCameraSensitivity: 50
-  cameraVerticalClampMin: -30
-  cameraVerticalClampMax: 90
+  mainCameraPitchMin: -60
+  mainCameraPitchMax: 20
+  aimCameraPitchMin: -50
+  aimCameraPitchMax: 80
+  aimModeSpeed: 4

@@ -1,33 +1,52 @@
-using UnityEditor.EditorTools;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Game Data/Player Stats")]
 public class PlayerVariables : ScriptableObject
 {
-    //Walk
+    [Header(" Walk/Sprint")]
     public float walkSpeed = 5;
-
-    //Sprint
     public float sprintSpeed = 8f;
 
-    //Jump
-    public float jumpForce = 4;
+    [Header("Jump")]
+    public float maxJumpHeight = 1.4f;
+    public float maxJumpTime = 0.5f;
+    public float jumpCutMultiplier = 0.5f;
+    public float cyoteTime = 0.4f;
 
-    //Dash
-    public float dashForce = 4;
+    [Header("Dash")]
     public int maxDashCharges = 2;
-    public float dashRegenTime = 1f;
+    public float dashInterval = 0.2f;
+    public float dashRegenTime = 0.6f;
     public float dashDuration = 0.8f;
+    public float dashDistance = 2f;
+    public float samllDashJumpHeight = 0.5f;
 
-    //LayerMasks
-    public LayerMask groundLayer;
+    [Header("Gravity")]
+    public float gravity = 10f;
+    [Space]
+    [Header("Air")]
+    public float airMoveSpeed = 0.6f;
+    public float maxAirSpeed = 2f;
+    public float airControl = 2f;
 
-    //Camera
+    [Header("Camera and Rotation")]
+    [Tooltip(" lower value -> slower turn")]
+    public float playerBodyRotationSpeed = 5f;
     public float horizontalCameraSensitivity = 50f;
     public float verticalCameraSensitivity = 50f;
-
+    
+    [Header("Main Camera")]
     [Tooltip("minimum value to look down, place between 0 to (-90)")]
-    public float cameraVerticalClampMin = -80f;
+    public float mainCameraPitchMin = -60f;
     [Tooltip("maximum value to look up, place between 0 to 90")]
-    public float cameraVerticalClampMax = 90f;
+    public float mainCameraPitchMax = 30f;
+  
+    [Header("Aim Camera")]
+    [Tooltip("minimum value to look down, place between 0 to (-90)")]
+    public float aimCameraPitchMin = -80f;
+    [Tooltip("maximum value to look up, place between 0 to 90")]
+    public float aimCameraPitchMax = 70f;
+
+    [Header("Aim Mode")]
+    public float aimModeSpeed = 4f;
 }
