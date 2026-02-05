@@ -1,11 +1,10 @@
+using UnityEngine;
+
 public class Ranged : AttackStatebase
 {
-    public Ranged(PlayerWeaponsManager ctx, AttackStateFactory factory) : base(ctx, factory) { }
-
-    private WeaponData data;
+    public Ranged(PlayerWeaponsManager ctxWeapons, AttackStateFactory factory) : base(ctxWeapons, factory) { }
     public override void Enter()
     {
-        // data = Ctx.CurrentWeapon.weaponData;
         //start equip anim of the weapon
     }
     public override void Exit()
@@ -14,10 +13,20 @@ public class Ranged : AttackStatebase
     }
     public override void UpdateWeapon()
     {
-        if (Ctx.Input.AttackHeld)
-        {
+        IWeapons weapon = CtxWeapons.CurrentWeapons;
+        if (weapon == null) return;
 
+        if (CtxWeapons.Input.AttackHeld && weapon.CanFire())
+        {
+            weapon.Fire();
         }
+
+        if (CtxWeapons.Input.ReloadPressed && weapon.CanReload())
+            weapon.Reload();
     }
-    public override void CheckSwitch() { }
+    public override void CheckSwitch()
+    {
+        if (!CtxWeapons.Input.IsAiming && !CtxWeapons.Input.AttackHeld)
+            SwitchWeapon(Factory.Idle());
+    }
 }

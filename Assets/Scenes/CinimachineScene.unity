@@ -1528,6 +1528,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1469466938}
+  - component: {fileID: 1469466939}
   m_Layer: 0
   m_Name: Bow
   m_TagString: Untagged
@@ -1551,6 +1552,19 @@ Transform:
   - {fileID: 997222918}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1469466939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1469466937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4add4f0dc213e874492bc9288ac3be41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _weaponData: {fileID: 11400000, guid: b1da7ef6ce781334b8003e8ef85d1fe4, type: 2}
 --- !u!1 &1544758649
 GameObject:
   m_ObjectHideFlags: 0
@@ -1674,8 +1688,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d7d9422b7db8da42a8eb1d62e74250a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _input: {fileID: 1544758651}
   _variables: {fileID: 11400000, guid: 2dfbcdc73322f0c47bd447d450e7b06c, type: 2}
-  _weaponPosition: {fileID: 0}
+  _weaponPosition: {fileID: 849888860}
+  _weaponPrefabs: []
 --- !u!1 &1706263860
 GameObject:
   m_ObjectHideFlags: 0

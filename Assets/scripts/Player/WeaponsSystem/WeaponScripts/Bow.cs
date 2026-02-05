@@ -2,15 +2,36 @@ using UnityEngine;
 public class Bow : MonoBehaviour, IWeapons
 {
     [SerializeField] private WeaponData _weaponData;
-    [SerializeField] private WeaponTypeEnum _weaponTypeEnum;
-    public WeaponData _data { get { return _weaponData; } }
-    public WeaponTypeEnum _type { get { return _weaponTypeEnum; } }
+    public WeaponData Data => _weaponData;
+    public WeaponTypeEnum Type => WeaponTypeEnum.Ranged;
+    private float _lastFireTime;
+    private int _currentAmmo;
 
-    public void Reload() { }
-    public void Fire() { }
-    public void Equip() { }
-    public void Unequip() { }
+    private void Start()
+    {
+        _currentAmmo = _weaponData.ammoCapacity;
+    }
 
-    public bool CanFire() { throw new System.NotImplementedException(); }
-    public bool CanReload() { throw new System.NotImplementedException(); }
+    public void Reload()
+    {
+        if (!CanReload()) return;
+
+        _currentAmmo = _weaponData.ammoCapacity;
+        Debug.Log($"Reolad Complete, current ammo {_currentAmmo}");
+    }
+    public void Fire(float Charge)
+    {
+        if (!CanFire()) return;
+        _lastFireTime = Time.time;
+        _currentAmmo--;
+        Debug.Log($"Arrow fired, remaining ammo {_currentAmmo}");
+    }
+    public void Equip() { gameObject.SetActive(true); }
+    public void Unequip() { gameObject.SetActive(false); }
+
+    public bool CanFire()
+    {
+        return _currentAmmo > 0 && Time.time >= _lastFireTime + _weaponData.firerate;
+    }
+    public bool CanReload() { return _currentAmmo < _weaponData.ammoCapacity; }
 }

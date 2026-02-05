@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,6 +26,7 @@ public class PlayerInputHandler : MonoBehaviour
     //Attack
     private bool _attackHeld;
     private bool _attackPressed;
+    private bool _reloadPressed;
 
     #endregion
     #region Getters/Setters
@@ -45,6 +47,7 @@ public class PlayerInputHandler : MonoBehaviour
     //Attack
     public bool AttackHeld { get { return _attackHeld; } }
     public bool AttackPressed { get { return _attackPressed; } }
+    public bool ReloadPressed { get { return _reloadPressed; } }
     //Attack -> Ranged
     public bool IsAiming { get { return _attackHeld || _aimToggle; } }
 
@@ -71,8 +74,16 @@ public class PlayerInputHandler : MonoBehaviour
         _action.Player.Attack.performed += context => OnAttack(context);
         _action.Player.Attack.canceled += context => OnAttack(context);
 
+        _action.Player.Reload.performed += context => OnReolad(context);
+        _action.Player.Reload.canceled += context => OnReolad(context);
+
         _action.Player.AimMode.performed += context => OnAimEnabled(context);
         _action.Player.AimMode.canceled += context => OnAimEnabled(context);
+    }
+
+    private void OnReolad(InputAction.CallbackContext context)
+    {
+        _reloadPressed = context.ReadValueAsButton();
     }
 
     #region calback references

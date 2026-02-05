@@ -1,9 +1,9 @@
 public interface IWeapons
 {
-    public WeaponData _data { get; }
-    public WeaponTypeEnum _type { get; }
+    public WeaponData Data { get; }
+    public WeaponTypeEnum Type { get; }
     public void Reload();
-    public void Fire();
+    public void Fire(float charge);
     public void Equip();
     public void Unequip();
 

@@ -1,6 +1,6 @@
 public class Idle : AttackStatebase
 {
-    public Idle(PlayerWeaponsManager ctx, AttackStateFactory factory) : base(ctx, factory) { }
+    public Idle(PlayerWeaponsManager ctxWeapons, AttackStateFactory factory) : base(ctxWeapons, factory) { }
     public override void CheckSwitch() { }
     public override void Exit() { }
     public override void Enter() { }

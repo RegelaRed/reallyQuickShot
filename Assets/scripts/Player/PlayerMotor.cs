@@ -20,19 +20,17 @@ public class PlayerMotor : MonoBehaviour
     //Getters and Setters
 
     //dash
-    public bool IsDashing { get { return _isDashing; } }
-    public float DashTime { get { return _dashTimer; } }
-    public bool CanDash { get { return _dashTimer <= 0; } }
+    public bool IsDashing => _isDashing;
+    public float DashTime => _dashTimer;
+    public bool CanDash => _dashTimer <= 0;
     //Upward force
-    public float VerticalVelocity { get { return _verticalFloat; } }
+    public float VerticalVelocity => _verticalFloat;
     //gravity
-    public float Gravity { get { return _gravity; } }
+    public float Gravity =>_gravity;
     //movement
-    public Vector3 FinalMoveVector { get { return CalculateFinalMoveVector(); } }
-    public float CurrentSpeed { get { return _currentSpeed; } }
-    public Vector3 CurrentMovementVector { get { return _horizontalVelocity; } }
-
-
+    public Vector3 FinalMoveVector => CalculateFinalMoveVector();
+    public float CurrentSpeed => _currentSpeed;
+    public Vector3 CurrentMovementVector => _horizontalVelocity;
 
     #endregion
     #region Updates

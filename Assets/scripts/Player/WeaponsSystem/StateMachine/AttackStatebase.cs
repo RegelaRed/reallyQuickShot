@@ -1,14 +1,14 @@
 public abstract class AttackStatebase
 {
-    private PlayerWeaponsManager _ctx;
+    private PlayerWeaponsManager _ctxWeapons;
     private AttackStateFactory _factory;
 
-    public PlayerWeaponsManager Ctx { get { return _ctx; } }
+    public PlayerWeaponsManager CtxWeapons { get { return _ctxWeapons; } }
     public AttackStateFactory Factory { get { return _factory; } }
 
-    public AttackStatebase(PlayerWeaponsManager ctx, AttackStateFactory factory)
+    public AttackStatebase(PlayerWeaponsManager ctxWeapons, AttackStateFactory factory)
     {
-        _ctx = ctx;
+        _ctxWeapons = ctxWeapons;
         _factory = factory;
     }
     public abstract void Enter();
@@ -16,8 +16,8 @@ public abstract class AttackStatebase
     public abstract void UpdateWeapon();
     public void SwitchWeapon(AttackStatebase newWeapon)
     {
-        _ctx.CurrentWeapon.Exit();
-        _ctx.CurrentWeapon = newWeapon;
+        _ctxWeapons.CurrentAttackState.Exit();
+        _ctxWeapons.CurrentAttackState = newWeapon;
         newWeapon.Enter();
 
     }
