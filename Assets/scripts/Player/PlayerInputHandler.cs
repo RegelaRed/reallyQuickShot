@@ -28,6 +28,10 @@ public class PlayerInputHandler : MonoBehaviour
     private bool _attackPressed;
     private bool _reloadPressed;
 
+    //weapon switching
+    private bool _weaponPrevious;
+    private bool _weaponNext;
+
     #endregion
     #region Getters/Setters
     //Walk
@@ -50,6 +54,10 @@ public class PlayerInputHandler : MonoBehaviour
     public bool ReloadPressed { get { return _reloadPressed; } }
     //Attack -> Ranged
     public bool IsAiming { get { return _attackHeld || _aimToggle; } }
+
+    //weapon switching
+    public bool WeaponPrevious { get { return _weaponPrevious; } }
+    public bool WeaponNext { get { return _weaponNext; } }
 
     #endregion
     private void Awake()
@@ -79,6 +87,12 @@ public class PlayerInputHandler : MonoBehaviour
 
         _action.Player.AimMode.performed += context => OnAimEnabled(context);
         _action.Player.AimMode.canceled += context => OnAimEnabled(context);
+
+        _action.Player.Previous.performed += context => OnPrevious(context);
+        _action.Player.Previous.canceled += context => OnPrevious(context);
+
+        _action.Player.Previous.performed += context => OnNext(context);
+        _action.Player.Previous.canceled += context => OnNext(context);
     }
 
     private void OnReolad(InputAction.CallbackContext context)
@@ -124,6 +138,18 @@ public class PlayerInputHandler : MonoBehaviour
             _aimToggle = !_aimToggle;
         }
     }
+
+    private void OnPrevious(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            _weaponPrevious = true;
+    }
+    private void OnNext(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            _weaponNext = true;
+    }
+
     #endregion
     //playerInput requirements
     public void OnEnable() { _action.Player.Enable(); }
@@ -134,5 +160,7 @@ public class PlayerInputHandler : MonoBehaviour
         _isJumpPressedThisFrame = false;
         _isDashPressedThisFrame = false;
         _attackPressed = false;
+        _weaponNext = false;
+        _weaponPrevious = false;
     }
 }

@@ -3,7 +3,7 @@ public class Bow : MonoBehaviour, IWeapons
 {
     [SerializeField] private WeaponData _weaponData;
     public WeaponData Data => _weaponData;
-    public WeaponTypeEnum Type => WeaponTypeEnum.Ranged;
+    public WeaponTypeEnum Type => _weaponData.type;
     private float _lastFireTime;
     private int _currentAmmo;
 

@@ -43,12 +43,21 @@ public class PlayerWeaponsManager : MonoBehaviour
         //initialize current weapons
         foreach (var prefab in _weaponPrefabs)
         {
-            IWeapons weapon = prefab.GetComponent<IWeapons>();
+            GameObject weaponObj = Instantiate(prefab, _weaponIdlePos);
+            IWeapons weapon = weaponObj.GetComponent<IWeapons>();
             if (weapon != null)
+            {
                 _weapons.Add(weapon);
+                weaponObj.SetActive(false);
+            }
+            else
+            {
+                Debug.Log($"Prefab {prefab.name} doesn't have IWeapons");
+                Destroy(weaponObj);
+            }
         }
         if (_weapons.Count > 0)
-            EquiupWeapon(0);
+            EquipWeapon(0);
 
         //AtatckMode SM
         _attackStateFactory = new AttackStateFactory(this);
@@ -59,28 +68,51 @@ public class PlayerWeaponsManager : MonoBehaviour
     private void Update()
     {
         _currentAttackState.UpdateWeapon();
+
+        if (Input.WeaponNext)
+            SwitchToNextWeapon(1);
+        if (Input.WeaponPrevious)
+            SwitchToNextWeapon(-1);
     }
 
-    private void EquiupWeapon(int index)
+    private void EquipWeapon(int index)
     {
-        if (index < 0 || index > _weapons.Count) return;
+        if (index < 0 || index >= _weapons.Count) return;
 
-        _currentWeapon.Unequip();
+        if (_currentWeapon != null) _currentWeapon.Unequip();
 
         _currentWeaponIndex = index;
         _currentWeapon = _weapons[index];
         _currentWeapon.Equip();
 
-        if (_currentWeapon.Type == WeaponTypeEnum.Melee)
-            _currentAttackState.SwitchWeapon(_attackStateFactory.Melee());
-        else if (_currentWeapon.Type == WeaponTypeEnum.Ranged)
-            _currentAttackState.SwitchWeapon(_attackStateFactory.Ranged());
+
+        switch (_currentWeapon.Type)
+        {
+            case WeaponTypeEnum.Idle:
+                _currentAttackState.SwitchWeapon(_attackStateFactory.Idle());
+                break;
+            case WeaponTypeEnum.Melee:
+                _currentAttackState.SwitchWeapon(_attackStateFactory.Melee());
+                break;
+            case WeaponTypeEnum.MeeleCharged:
+                _currentAttackState.SwitchWeapon(_attackStateFactory.MeleeCharged());
+                break;
+            case WeaponTypeEnum.Ranged:
+                _currentAttackState.SwitchWeapon(_attackStateFactory.Ranged());
+                break;
+            case WeaponTypeEnum.RangedCharged:
+                _currentAttackState.SwitchWeapon(_attackStateFactory.RangedCharged());
+                break;
+            default:
+                Debug.Log($"Current attack state is null");
+                break;
+        }
     }
 
-    public void SwitchToNextWeapon()
+    public void SwitchToNextWeapon(int ind)
     {
-        int nextIndex = (_currentWeaponIndex + 1) % _weapons.Count;
-        EquiupWeapon(nextIndex);
+        int nextIndex = (_currentWeaponIndex + ind) % _weapons.Count;
+        EquipWeapon(nextIndex);
     }
     public void CreateProjectile(GameObject projectile, Vector3 direction, float speed)
     {

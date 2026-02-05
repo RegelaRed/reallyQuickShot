@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class Ranged : AttackStatebase
 {
     public Ranged(PlayerWeaponsManager ctxWeapons, AttackStateFactory factory) : base(ctxWeapons, factory) { }
@@ -18,11 +16,13 @@ public class Ranged : AttackStatebase
 
         if (CtxWeapons.Input.AttackHeld && weapon.CanFire())
         {
-            weapon.Fire();
+            weapon.Fire(0f);
         }
 
         if (CtxWeapons.Input.ReloadPressed && weapon.CanReload())
             weapon.Reload();
+
+        CheckSwitch();
     }
     public override void CheckSwitch()
     {
