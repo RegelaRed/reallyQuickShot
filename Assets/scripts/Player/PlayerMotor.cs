@@ -26,7 +26,7 @@ public class PlayerMotor : MonoBehaviour
     //Upward force
     public float VerticalVelocity => _verticalFloat;
     //gravity
-    public float Gravity =>_gravity;
+    public float Gravity => _gravity;
     //movement
     public Vector3 FinalMoveVector => CalculateFinalMoveVector();
     public float CurrentSpeed => _currentSpeed;
@@ -122,6 +122,7 @@ public class PlayerMotor : MonoBehaviour
         if (!_isDashing)
             return;
 
+        if (_ctx.IsOnGround) _dashTimer = 0f;
         if (_dashTimer > 0f)
         {
             _dashTimer -= Time.deltaTime;

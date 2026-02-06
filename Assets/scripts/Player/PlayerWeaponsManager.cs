@@ -1,121 +1,67 @@
-using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class PlayerWeaponsManager : MonoBehaviour
 {
-    [Header("References")]
+    [SerializeField] private PlayerInputHandler _playerInput;
+    [SerializeField] private Transform _weaponPositionIdle;
+    [SerializeField] private Transform _weaponPositionActive;
+    [SerializeField] private List<GameObject> _weaponPrefabs;
 
-    //Script References
-    [SerializeField] private PlayerInputHandler _input;
-    [SerializeField] private PlayerVariables _variables;
-
-    //Transforms and prefabs
-
-    [SerializeField] private Transform _weaponIdlePos;
-    [SerializeField] private Transform _weaponActivePos;
-
-    [SerializeField] List<GameObject> _weaponPrefabs;
-    //weapon switching
-    private AttackStatebase _currentAttackState;
-    private AttackStateFactory _attackStateFactory;
-
-    private List<IWeapons> _weapons = new List<IWeapons>();
+    private List<IWeapons> _weaponList = new List<IWeapons>();
+    private int _currentWeaponIndex;
     private IWeapons _currentWeapon;
-    private int _currentWeaponIndex = 0;
 
-    //Getters/Setters
-    public PlayerInputHandler Input { get { return _input; } }
-    public PlayerVariables Variables { get { return _variables; } }
+    [SerializeField] private float idleTime = 10f;
+    private float _idleTimer;
 
-    public Transform WeaponIdlePositon { get { return _weaponIdlePos; } }
-    public Transform WeaponActivePositon { get { return _weaponActivePos; } }
-
-    public IWeapons CurrentWeapons { get { return _currentWeapon; } }
-    public AttackStatebase CurrentAttackState { get { return _currentAttackState; } set { _currentAttackState = value; } }
+    public PlayerInputHandler Input { get { return _playerInput; } }
 
     private void Awake()
     {
-        //Input 
-        if (_input == null) _input = GetComponent<PlayerInputHandler>();
+        if (_playerInput == null) _playerInput = GetComponent<PlayerInputHandler>();
 
-        //initialize current weapons
         foreach (var prefab in _weaponPrefabs)
         {
-            GameObject weaponObj = Instantiate(prefab, _weaponIdlePos);
+            GameObject weaponObj = Instantiate(prefab, _weaponPositionIdle);
             IWeapons weapon = weaponObj.GetComponent<IWeapons>();
             if (weapon != null)
             {
-                _weapons.Add(weapon);
+                _weaponList.Add(weapon);
                 weaponObj.SetActive(false);
             }
             else
             {
-                Debug.Log($"Prefab {prefab.name} doesn't have IWeapons");
                 Destroy(weaponObj);
             }
         }
-        if (_weapons.Count > 0)
-            EquipWeapon(0);
-
-        //AtatckMode SM
-        _attackStateFactory = new AttackStateFactory(this);
-        _currentAttackState = _attackStateFactory.Idle();
-        _currentAttackState.Enter();
     }
-
     private void Update()
     {
-        _currentAttackState.UpdateWeapon();
-
-        if (Input.WeaponNext)
-            SwitchToNextWeapon(1);
-        if (Input.WeaponPrevious)
-            SwitchToNextWeapon(-1);
+        if (_currentWeapon != null)
+            _currentWeapon.UpdateWeapon();
+        else
+            Debug.Log($"current weapon is null");
+        SwitchWeapon();
     }
 
-    private void EquipWeapon(int index)
+    void SwitchWeapon()
     {
-        if (index < 0 || index >= _weapons.Count) return;
+        if (_currentWeapon is Ranged_Bow)
+        {
+            EquipWeapon(0);
+        }
 
-        if (_currentWeapon != null) _currentWeapon.Unequip();
+    }
+    void EquipWeapon(int index)
+    {
+        if (index < 0 || index >= _weaponList.Count) return;
+        if (_currentWeapon != null)
+            _currentWeapon.Exit();
 
         _currentWeaponIndex = index;
-        _currentWeapon = _weapons[index];
-        _currentWeapon.Equip();
-
-
-        switch (_currentWeapon.Type)
-        {
-            case WeaponTypeEnum.Idle:
-                _currentAttackState.SwitchWeapon(_attackStateFactory.Idle());
-                break;
-            case WeaponTypeEnum.Melee:
-                _currentAttackState.SwitchWeapon(_attackStateFactory.Melee());
-                break;
-            case WeaponTypeEnum.MeeleCharged:
-                _currentAttackState.SwitchWeapon(_attackStateFactory.MeleeCharged());
-                break;
-            case WeaponTypeEnum.Ranged:
-                _currentAttackState.SwitchWeapon(_attackStateFactory.Ranged());
-                break;
-            case WeaponTypeEnum.RangedCharged:
-                _currentAttackState.SwitchWeapon(_attackStateFactory.RangedCharged());
-                break;
-            default:
-                Debug.Log($"Current attack state is null");
-                break;
-        }
-    }
-
-    public void SwitchToNextWeapon(int ind)
-    {
-        int nextIndex = (_currentWeaponIndex + ind) % _weapons.Count;
-        EquipWeapon(nextIndex);
-    }
-    public void CreateProjectile(GameObject projectile, Vector3 direction, float speed)
-    {
-
+        _currentWeapon = _weaponList[index];
+        _currentWeapon.Enter();
     }
 }

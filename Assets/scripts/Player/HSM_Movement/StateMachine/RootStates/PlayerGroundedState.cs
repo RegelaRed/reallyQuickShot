@@ -13,11 +13,11 @@ public class PlayerGroundedState : PlayerBaseState
     }
     public override void CheckSwitchState()
     {
-        if (Ctx.Input.IsJumpPressed && Ctx.Input.IsJumpPressedThisFrame)
+        if (Ctx.Input.IsJumpPressed && (Ctx.Input.JumpBufferActive || Ctx.Input.IsJumpPressedThisFrame))
         {
             SwitchStates(Factory.Jump());
         }
-        else if (Ctx.CanDash && Ctx.Input.IsDashPressedThisFrame)
+        else if (Ctx.CanDash && (Ctx.Input.DashBufferActive || Ctx.Input.IsDashPressedThisFrame))
         {
             Ctx.DashConsume();
             SwitchStates(Factory.Dash());
@@ -27,7 +27,6 @@ public class PlayerGroundedState : PlayerBaseState
             SwitchStates(Factory.Falling());
         }
     }
-
     private void UpdateSubstate()
     {
         PlayerBaseState desiredState = GetDesiredState();

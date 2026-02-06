@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66bc22182ae90654b9b9ae5f13d13e37, type: 3}
+  m_Script: {fileID: 11500000, guid: 3069a050c2e38704da1be5788ea3ff8c, type: 3}
   m_Name: Bow
   m_EditorClassIdentifier: 
-  type: 4
-  weaponID: Bow_weapon_Level1
-  firerate: 2
-  ammoCapacity: 10
-  chargeRate: 0
-  maxCharge: 0
+  ID: Bow
+  type: 2
+  fireRate: 1
+  cahargeRate: 0.2
+  maxCharge: 2
+  maxAmmo: 15
