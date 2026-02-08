@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-public class Ranged_Bow : WeaponsBase
+public class temp : WeaponsBase
 {
     [SerializeField] private WeaponData _weaponData;
     [SerializeField] private List<GameObject> _ammoPrefabs;
 
     private GameObject _currentAmmoPrefab;
+    private int _ammoPrefabIndex;
     private int _currentAmmoIndex;
 
     private float _reloadTimer;
@@ -18,34 +20,22 @@ public class Ranged_Bow : WeaponsBase
     public bool _canAttack { get { return _currentAmmo > 0 && !(_reloadTimer > 0f); } }
     public bool _canReload { get { return _currentAmmo < _weaponData.maxAmmo; } }
 
-    public override void Equip()
+    public override void Equip() { }
+    public override void UnEquip() { }
+    public override void UpdateWeapon()
     {
-        transform.position = _wtx.WeaponPositionActive.position;
-        gameObject.SetActive(true);
-
-        Debug.Log($"Bow Activated");
-    }
-    public override void UnEquip()
-    {
-        transform.position = _wtx.WeaponPositionIdle.position;
-        gameObject.SetActive(false);
-        Debug.Log($"Bow Deactivated");
-    }
-    public override void UpdateWeapon(WeaponInput input)
-    {
-        if (input.AttackHeld && !_reloading) AttackPressed();
-        else if (!input.AttackHeld && !_reloading) AtackReleased();
+        if (_wtx.Input.AttackHeld && !_reloading) AttackPressed();
+        else if (!_wtx.Input.AttackHeld && !_reloading) AtackReleased();
 
         Timers();
-        if (input.ReloadPressed && _canReload && !_reloading) Reload();
+        if (_wtx.Input.ReloadPressed && _canReload && !_reloading) Reload();
 
-        if (input.AmmoNext) SwitchAmmo();
-        else if (input.AmmoPrevious) SwitchAmmo(-1);
+        if (_wtx.Input.AmmoNext) SwitchAmmo();
+        else if (_wtx.Input.AmmoPrevious) SwitchAmmo(-1);
     }
     private void AttackPressed()
     {
         if (!_canAttack) return;
-        Debug.Log($"Attack Pressed Called");
         _charge += _weaponData.chargeRate * Time.deltaTime;
         _charge = Mathf.Min(_charge, _weaponData.maxCharge);
     }
@@ -53,7 +43,6 @@ public class Ranged_Bow : WeaponsBase
     {
         if (_charge > 0 && _canAttack)
         {
-            Debug.Log($"Attack Released Called");
             Attack();
             _charge = 0f;
         }
@@ -66,7 +55,6 @@ public class Ranged_Bow : WeaponsBase
     public void Reload()
     {
         _reloadTimer = _weaponData.reloadTime;
-        _charge = 0f;
     }
     private void Timers()
     {
@@ -79,12 +67,6 @@ public class Ranged_Bow : WeaponsBase
     }
     public override void OnInitialize(PlayerWeaponsManager wtx)
     {
-        if (_ammoPrefabs == null || _ammoPrefabs.Count == 0)
-        {
-            Debug.LogError("No ammo prefabs assigned", this);
-            enabled = false;
-            return;
-        }
         _currentAmmo = _weaponData.maxAmmo;
         EquipAmmo(0);
     }

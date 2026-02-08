@@ -61,16 +61,16 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Previous",
+                    "name": "Weapon1",
                     "type": "Button",
                     "id": "2776c80d-3c14-4091-8c56-d04ced07a2b0",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Next",
+                    "name": "Weapon2",
                     "type": "Button",
                     "id": "b7230bb6-fc9b-4f52-8b25-f5e19cb2c2ba",
                     "expectedControlType": "",
@@ -115,7 +115,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SwitchWeapon",
+                    "name": "SwitchAmmo",
                     "type": "Button",
                     "id": "042172ad-e86e-467d-8084-02183d99c309",
                     "expectedControlType": "",
@@ -363,7 +363,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Next",
+                    "action": "Weapon2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -374,7 +374,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Next",
+                    "action": "Weapon2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -385,7 +385,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Next",
+                    "action": "Weapon2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -462,7 +462,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Previous",
+                    "action": "Weapon1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -473,7 +473,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "Previous",
+                    "action": "Weapon1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -484,7 +484,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Previous",
+                    "action": "Weapon1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -572,7 +572,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "SwitchWeapon",
+                    "action": "SwitchAmmo",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

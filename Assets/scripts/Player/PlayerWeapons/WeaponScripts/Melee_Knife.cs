@@ -1,13 +1,10 @@
 using UnityEngine;
 
-public class Melee_Knife : MonoBehaviour, IWeapons
+public class Melee_Knife : WeaponsBase
 {
-    [SerializeField] private WeaponData _data;
-    public WeaponData Data => _data;
-
-    public void Enter() { }
-    public void Exit() { }
-    public void Attack() { }
-    public void Reload() { }
-    public void UpdateWeapon() { }
+    public override void Equip() { }
+    public override void UnEquip() { }
+    public override void UpdateWeapon(WeaponInput input) { }
+    public override void Attack() { }
+    private void Timers() { }
 }

@@ -97,17 +97,17 @@ public class PlayerInputHandler : MonoBehaviour
         _action.Player.AimMode.performed += context => OnAimEnabled(context);
         _action.Player.AimMode.canceled += context => OnAimEnabled(context);
 
-        _action.Player.Previous.performed += context => OnPrevious(context);
-        _action.Player.Previous.canceled += context => OnPrevious(context);
+        _action.Player.Weapon1.performed += context => OnWeapon1(context);
+        _action.Player.Weapon1.canceled += context => OnWeapon1(context);
 
-        _action.Player.Next.performed += context => OnNext(context);
-        _action.Player.Next.canceled += context => OnNext(context);
+        _action.Player.Weapon2.performed += context => OnWeapon2(context);
+        _action.Player.Weapon2.canceled += context => OnWeapon2(context);
 
-        _action.Player.SwitchWeapon.performed += context => OnSwitchWeapon(context);
-        _action.Player.SwitchWeapon.canceled += context => OnSwitchWeapon(context);
+        _action.Player.SwitchAmmo.performed += context => OnSwitchAmmo(context);
+        _action.Player.SwitchAmmo.canceled += context => OnSwitchAmmo(context);
     }
 
-    private void OnSwitchWeapon(InputAction.CallbackContext context)
+    private void OnSwitchAmmo(InputAction.CallbackContext context)
     {
         if (context.performed)
             _switchWeaponPressed = true;
@@ -164,12 +164,12 @@ public class PlayerInputHandler : MonoBehaviour
             _aimToggle = !_aimToggle;
         }
     }
-    private void OnPrevious(InputAction.CallbackContext context)
+    private void OnWeapon1(InputAction.CallbackContext context)
     {
         if (context.performed)
             _ammoPrevious = true;
     }
-    private void OnNext(InputAction.CallbackContext context)
+    private void OnWeapon2(InputAction.CallbackContext context)
     {
         if (context.performed)
             _ammoNext = true;

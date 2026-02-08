@@ -1,12 +1,8 @@
-using UnityEngine;
-
-public class WeaponIdle : MonoBehaviour, IWeapons
+public class WeaponIdle : WeaponsBase
 {
-    [SerializeField] private WeaponData _weaponData;
-    public WeaponData Data => _weaponData;
-    public void Attack() { }
-    public void Enter() { }
-    public void Exit() { }
-    public void Reload() { }
-    public void UpdateWeapon() { }
+    public override void Attack() { }
+    public override void Equip() { }
+    public override void UnEquip() { }
+    public override void UpdateWeapon(WeaponInput input) { }
+    public override void OnInitialize(PlayerWeaponsManager wtx) { }
 }

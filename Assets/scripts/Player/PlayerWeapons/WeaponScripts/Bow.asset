@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3069a050c2e38704da1be5788ea3ff8c, type: 3}
   m_Name: Bow
   m_EditorClassIdentifier: 
-  ID: Bow
   type: 2
-  fireRate: 1
+  fireRate: 1.2
   cahargeRate: 0.2
+  reloadTime: 0.4
   maxCharge: 2
   maxAmmo: 15
