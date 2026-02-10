@@ -45,11 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 145eecfff4a464344b89833eade83ff4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _weaponData: {fileID: 11400000, guid: 3a340cb63d6b70b448dbeb5e80d1ff49, type: 2}
   _wtx: {fileID: 712001800155893060, guid: 67aa950a8ebfbbe47a249939d0ff399d, type: 3}
-  _ammoPrefabs:
-  - {fileID: 5407193841000607650, guid: 457e40d7986ec2043b043c245709b371, type: 3}
-  - {fileID: 4584307381342953628, guid: bce66ed74927a114ab2cdfc4d6fcda7b, type: 3}
+  _weaponData: {fileID: 11400000, guid: 3a340cb63d6b70b448dbeb5e80d1ff49, type: 2}
+  _ammoDataObject:
+  - {fileID: 11400000, guid: 7cc72aa01b2e528429ce3b8f183e67df, type: 2}
+  - {fileID: 11400000, guid: c6b9dccc4249bbf49b990c5418d11627, type: 2}
 --- !u!1 &4589153060203406397
 GameObject:
   m_ObjectHideFlags: 0

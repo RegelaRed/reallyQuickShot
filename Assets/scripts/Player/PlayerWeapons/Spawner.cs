@@ -1,14 +1,24 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    private GameObject _currentObject;
-    public void CreateProjectile(float speed, Transform startPosition, GameObject prefab)
+    public void CreateProjectile(ProjectileData projectileData, float chargePercentage, Transform startPosition)
     {
-        _currentObject = Instantiate(prefab, startPosition.position, startPosition.rotation);
-        Rigidbody rb = _currentObject.GetComponent<Rigidbody>();
-        rb.AddForce(startPosition.forward.normalized * speed);
-        Destroy(_currentObject, 8f);
+        Debug.Log($"Spawner Called {projectileData.prefab.name}");
+
+        // Calculate velocity based on charge
+        float minSpeed = projectileData.speed / 3;
+        float maxSpeed = projectileData.speed;
+
+        float speed = Mathf.Lerp(minSpeed, maxSpeed, chargePercentage);
+        Vector3 velocity = startPosition.forward * speed;
+
+        // Spawn through manager
+        ProjectileManager.Instance.Spawn(
+            projectileData,
+            startPosition.position,
+            startPosition.rotation,
+            velocity
+        );
     }
 }
