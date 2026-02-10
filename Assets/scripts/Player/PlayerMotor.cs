@@ -16,6 +16,8 @@ public class PlayerMotor : MonoBehaviour
     //dash variables
     private bool _isDashing;
     private float _dashTimer;
+    private bool _dashLeftGround;
+
 
     //Getters and Setters
 
@@ -41,9 +43,9 @@ public class PlayerMotor : MonoBehaviour
         _currentSpeed = _ctx.Variables.walkSpeed;
     }
 
-    public void UpdatePhysics()
+    public void UpdatePhysics(PlayerContext ctx)
     {
-        DashReset();
+        DashStates();
         ApplyGravity();
         _ctx.Controller.Move(CalculateFinalMoveVector() * Time.deltaTime);
     }
@@ -91,11 +93,37 @@ public class PlayerMotor : MonoBehaviour
     //Dash
     public void StartDash(float distance, float duration, Vector3 direction)
     {
-        _horizontalVelocity = Vector3.zero;
         _isDashing = true;
+        _dashLeftGround = false;
+
+        _horizontalVelocity = Vector3.zero;
         _dashTimer = duration;
         _currentSpeed = distance / duration;
         _horizontalVelocity = direction.normalized;
+    }
+    private void DashStates()
+    {
+        if (!_isDashing)
+            return;
+
+        if (!_ctx.IsOnGround)
+            _dashLeftGround = true;
+
+        if (_dashLeftGround && _ctx.IsOnGround)
+            EndDash();
+
+        if (_dashTimer > 0f)
+        {
+            _dashTimer -= Time.deltaTime;
+            if (_dashTimer <= 0f)
+                EndDash();
+        }
+    }
+    private void EndDash()
+    {
+        _isDashing = false;
+        _currentSpeed = 0f;
+        _dashTimer = 0f;
     }
     //set variables
     public void SetGravity(float gravity)
@@ -117,19 +145,6 @@ public class PlayerMotor : MonoBehaviour
         else
             _currentSpeed = baseSpeed;
     }
-    private void DashReset()
-    {
-        if (!_isDashing)
-            return;
 
-        if (_ctx.IsOnGround) _dashTimer = 0f;
-        if (_dashTimer > 0f)
-        {
-            _dashTimer -= Time.deltaTime;
-            return;
-        }
-        _isDashing = false;
-        _currentSpeed = 0f;
-    }
     #endregion
 }

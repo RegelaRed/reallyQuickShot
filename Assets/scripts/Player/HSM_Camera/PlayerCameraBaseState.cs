@@ -38,10 +38,12 @@ public abstract class PlayerCameraBaseState
     //Default States
     public abstract void EnterState();
     public abstract void ExitState();
-    public abstract void UpdateState();
+    public abstract void UpdateState(PlayerContext ctx);
     public abstract void CheckSwitchState();
     protected void SwitchStates(PlayerCameraBaseState newState)
     {
+        newState.Yaw = Yaw;
+        newState.Pitch = Pitch;
         ExitState();
         newState.EnterState();
 
@@ -54,11 +56,11 @@ public abstract class PlayerCameraBaseState
             _currentSuperState.SetSubState(newState);
         }
     }
-    public void UpdateStates()
+    public void UpdateStates(PlayerContext ctx)
     {
-        UpdateState();
+        UpdateState(ctx);
         if (_currentSubState != null)
-            _currentSubState.UpdateStates();
+            _currentSubState.UpdateStates(ctx);
     }
     public void ExitStates()
     {

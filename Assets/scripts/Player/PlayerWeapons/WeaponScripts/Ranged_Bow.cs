@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,121 +10,151 @@ public class Ranged_Bow : WeaponsBase
     private int _currentAmmoIndex;
 
     private float _reloadTimer;
-    private bool _reloading { get { return _reloadTimer > 0f; } }
-
     private int _currentAmmo;
     private float _charge;
 
-    //flags
     private bool _attackHeldActive;
-    private bool _attackPos;
-    private bool _idlePos;
+    private bool _idlePos = true;
 
-    public bool _canAttack { get { return _currentAmmo > 0 && !(_reloadTimer > 0f); } }
-    public bool _canReload { get { return _currentAmmo < _weaponData.maxAmmo; } }
+    private bool IsReloading => _reloadTimer > 0f;
+    private bool CanAttack => _currentAmmo > 0 && !IsReloading;
+    private bool CanReload => _currentAmmo < _weaponData.maxAmmo;
 
-    public override void Equip()
-    {
-        transform.position = _wtx.WeaponPositionIdle.position;
-        _idlePos = true;
-        gameObject.SetActive(true);
-        Debug.Log($"Bow Activated");
-    }
-    public override void UnEquip()
-    {
-        transform.position = _wtx.WeaponPositionIdle.position;
-        gameObject.SetActive(false);
-        Debug.Log($"Bow Deactivated");
-    }
+    // ─────────────────────────────────────────────
+
     public override void UpdateWeapon(WeaponInput input)
     {
-        if (input.AttackHeld && !_reloading)
+        HandleAttack(input);
+        HandleReload(input);
+        HandleAmmoSwitch(input);
+        UpdateTimers();
+    }
+
+    // ───────────── Attack Flow ─────────────
+
+    private void HandleAttack(WeaponInput input)
+    {
+        if (IsReloading) return;
+
+        if (input.AttackHeld)
         {
             _attackHeldActive = true;
-            AttackPressed();
-            if (_idlePos || _wtx.Input.IsAiming)
-            {
-                transform.position = _wtx.WeaponPositionActive.position;
-                _idlePos = false;
-            }
-
+            ChargeAttack();
+            SetActivePose();
         }
-        else if (!input.AttackHeld && !_reloading && _attackHeldActive)
+        else if (input.AttackReleased)
         {
             _attackHeldActive = false;
-            AtackReleased();
-            if (!_idlePos || !_wtx.Input.IsAiming)
-            {
-                transform.position = _wtx.WeaponPositionIdle.position;
-                _idlePos = true;
-            }
+            ReleaseAttack();
+            SetIdlePose();
         }
-
-        Timers();
-        if (input.ReloadPressed && _canReload && !_reloading) Reload();
-
-        if (input.AmmoNext) SwitchAmmo();
-        else if (input.AmmoPrevious) SwitchAmmo(-1);
     }
-    private void AttackPressed()
+
+    private void ChargeAttack()
     {
-        if (!_canAttack) return;
-        // Debug.Log($"Attack Pressed Called");
+        if (!CanAttack) return;
+
         _charge += _weaponData.chargeRate * Time.deltaTime;
         _charge = Mathf.Min(_charge, _weaponData.maxCharge);
     }
-    private void AtackReleased()
+
+    private void ReleaseAttack()
     {
-        // Debug.Log($"Attack Released Called");
-        if (_charge > 0 && _canAttack)
-        {
-            Attack();
-            _charge = 0f;
-        }
+        if (_charge <= 0f) return;
+        if (!CanAttack) { _charge = 0f; return; }
+
+        Attack();
+        _charge = 0f;
     }
+
     public override void Attack()
     {
         _currentAmmo--;
-        float chargePercentage = _charge / _weaponData.maxCharge;
-        _wtx.Spawner.CreateProjectile(_currentAmmoDataObject, chargePercentage, _wtx.Controller.Orientation);
+        float chargePct = _charge / _weaponData.maxCharge;
+
+        _wtx.Spawner.CreateProjectile(
+            _currentAmmoDataObject,
+            chargePct,
+            _wtx.Controller.Orientation
+        );
     }
-    public void Reload()
+
+    // ───────────── Reload ─────────────
+
+    private void HandleReload(WeaponInput input)
     {
-        _reloadTimer = _weaponData.reloadTime;
-        _charge = 0f;
-    }
-    private void Timers()
-    {
-        if (_reloadTimer > 0)
+        if (input.ReloadPressed && CanReload && !IsReloading)
         {
-            _reloadTimer -= Time.deltaTime;
-            if (_reloadTimer <= 0f)
-                _currentAmmo = _weaponData.maxAmmo;
+            _reloadTimer = _weaponData.reloadTime;
+            _charge = 0f;
         }
     }
+
+    private void UpdateTimers()
+    {
+        if (_reloadTimer <= 0f) return;
+
+        _reloadTimer -= Time.deltaTime;
+        if (_reloadTimer <= 0f)
+        {
+            _currentAmmo = _weaponData.maxAmmo;
+            _charge = 0f;
+        }
+    }
+
+    // ───────────── Ammo ─────────────
+
+    private void HandleAmmoSwitch(WeaponInput input)
+    {
+        if (input.AmmoNext) SwitchAmmo(1);
+        else if (input.AmmoPrevious) SwitchAmmo(-1);
+    }
+
+    private void SwitchAmmo(int dir)
+    {
+        int count = _ammoDataObject.Count;
+        int index = (_currentAmmoIndex + dir + count) % count;
+        EquipAmmo(index);
+    }
+
+    private void EquipAmmo(int index)
+    {
+        _currentAmmoIndex = index;
+        _currentAmmoDataObject = _ammoDataObject[index];
+    }
+
+    // ───────────── Visuals ─────────────
+
+    private void SetActivePose()
+    {
+        if (_idlePos || _wtx.Input.IsAiming)
+        {
+            transform.localPosition = _wtx.WeaponPositionActive.position;
+            _idlePos = false;
+        }
+    }
+
+    private void SetIdlePose()
+    {
+        if (!_idlePos || !_wtx.Input.IsAiming)
+        {
+            transform.localPosition = _wtx.WeaponPositionIdle.position;
+            _idlePos = true;
+        }
+    }
+
+    // ───────────── Init ─────────────
+
     public override void OnInitialize(PlayerWeaponsManager wtx)
     {
         if (_ammoDataObject == null || _ammoDataObject.Count == 0)
         {
-            Debug.LogError("No ammo prefabs assigned", this);
+            Debug.LogError("No ammo assigned", this);
             enabled = false;
             return;
         }
+
         _currentAmmo = _weaponData.maxAmmo;
         EquipAmmo(0);
-    }
-
-    void SwitchAmmo(int x = 1)
-    {
-        int count = _ammoDataObject.Count;
-        int index = (_currentAmmoIndex + x + count) % count;
-        EquipAmmo(index);
-    }
-    void EquipAmmo(int index)
-    {
-        if (index < 0 || index >= _ammoDataObject.Count) return;
-
-        _currentAmmoDataObject = _ammoDataObject[index];
-        _currentAmmoIndex = index;
     }
 }

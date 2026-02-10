@@ -11,7 +11,8 @@ public class PlayerVariables : ScriptableObject
     public float maxJumpHeight = 1.4f;
     public float maxJumpTime = 0.5f;
     public float jumpCutMultiplier = 0.5f;
-    public float cyoteTime = 0.4f;
+    public float jumpBufferTime = 0.4f;
+    public float jumpInterval = 0.1f;
 
     [Header("Dash")]
     public int maxDashCharges = 2;
@@ -20,6 +21,7 @@ public class PlayerVariables : ScriptableObject
     public float dashDuration = 0.8f;
     public float dashDistance = 2f;
     public float samllDashJumpHeight = 0.5f;
+    public float dashBufferTimer = 0.2f;
 
     [Header("Gravity")]
     public float gravity = 10f;
@@ -34,13 +36,13 @@ public class PlayerVariables : ScriptableObject
     public float playerBodyRotationSpeed = 5f;
     public float horizontalCameraSensitivity = 50f;
     public float verticalCameraSensitivity = 50f;
-    
+
     [Header("Main Camera")]
     [Tooltip("minimum value to look down, place between 0 to (-90)")]
     public float mainCameraPitchMin = -60f;
     [Tooltip("maximum value to look up, place between 0 to 90")]
     public float mainCameraPitchMax = 30f;
-  
+
     [Header("Aim Camera")]
     [Tooltip("minimum value to look down, place between 0 to (-90)")]
     public float aimCameraPitchMin = -80f;

@@ -10,7 +10,7 @@ public class PlayerDashState : PlayerBaseState
     {
         if (CurrentSubState != null)
             CurrentSubState.ExitStates();
-        
+
         Vector3 dashDirection;
         if (Ctx.CurrentCameraState is PlayerAimCamera)
             dashDirection = Ctx.Orientation.forward;

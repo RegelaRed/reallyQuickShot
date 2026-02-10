@@ -20,23 +20,9 @@ public class ProjectileManager : MonoBehaviour
 
     private List<Projectile> _activeProjectiles = new List<Projectile>();
 
-    public Projectile Spawn(ProjectileData stats, Vector3 position, Quaternion rotation, Vector3 velocity)
-    {
-        if (stats.prefab == null)
-        {
-            Debug.Log("Projectile Prefab empty"); return null;
-        }
-        GameObject obj = Instantiate(stats.prefab, position, rotation);
-        Projectile projectile = obj.GetComponent<Projectile>();
+    public int GetActiveCount() => _activeProjectiles.Count;
 
-        if (projectile == null)
-        {
-            obj.AddComponent<Projectile>();
-        }
-        projectile.Initialize(stats, velocity);
-        _activeProjectiles.Add(projectile);
-        return projectile;
-    }
+    // ----------------------------------------
 
     private void Update()
     {
@@ -44,14 +30,43 @@ public class ProjectileManager : MonoBehaviour
         {
             if (_activeProjectiles[i] == null || _activeProjectiles[i].ShouldDestroy)
             {
-                if (_activeProjectiles[i] != null)
-                {
+                if (_activeProjectiles[i] == null)
                     Destroy(_activeProjectiles[i].gameObject);
-                }
+
                 _activeProjectiles.RemoveAt(i);
             }
         }
     }
+
+    // -------------------- Spawn --------------------
+
+    public Projectile Spawn(ProjectileData stats, Vector3 position, Quaternion rotation, Vector3 velocity)
+    {
+        Debug.Log($"Projectile spawn command called");
+
+        if (stats.prefab == null)
+        {
+            Debug.Log("Projectile Prefab empty");
+            return null;
+        }
+
+        GameObject obj = Instantiate(stats.prefab, position, rotation);
+        Projectile projectile = obj.GetComponent<Projectile>();
+
+        if (projectile == null)
+        {
+            obj.AddComponent<Projectile>();
+        }
+
+        projectile.Initialize(stats, velocity);
+
+        _activeProjectiles.Add(projectile);
+
+        return projectile;
+    }
+
+    // -------------------- Behaviour --------------------
+
     public void DestroyAll()
     {
         foreach (var proj in _activeProjectiles)
@@ -61,8 +76,6 @@ public class ProjectileManager : MonoBehaviour
         }
         _activeProjectiles.Clear();
     }
-
-    public int GetActiveCount() => _activeProjectiles.Count;
 
     public void PauseAll()
     {

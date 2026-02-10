@@ -3,36 +3,40 @@ using Unity.VisualScripting;
 public class PlayerGroundedState : PlayerBaseState
 {
     public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory) : base(_ctx, _factory)
-    { _ctx.PlayerMotor.SetGravity(_ctx.Variables.gravity); }
-    public override void EnterState() { InitializeSubState(); }
-    public override void ExitState() { Ctx.TimeLeftOnGround = Ctx.Variables.cyoteTime; }
-    public override void UpdateState()
+    { }
+    public override void EnterState(ref PlayerContext context)
     {
-        CheckSwitchState();
-        UpdateSubstate();
+        Ctx.PlayerMotor.SetGravity(context.Variables.gravity);
+        InitializeSubState(ref context);
     }
-    public override void CheckSwitchState()
+    public override void ExitState(ref PlayerContext context) { Ctx.TimeLeftOnGround = Ctx.Variables.jumpBufferTime; }
+    public override void UpdateState(ref PlayerContext context)
     {
-        if (Ctx.Input.IsJumpPressed && (Ctx.Input.JumpBufferActive || Ctx.Input.IsJumpPressedThisFrame))
+        CheckSwitchState(ref context);
+        UpdateSubstate(ref context);
+    }
+    public override void CheckSwitchState(ref PlayerContext context)
+    {
+        if (context.Input.JumpPressed && (Ctx.Input.JumpBufferActive || Ctx.Input.IsJumpPressedThisFrame))
         {
-            SwitchStates(Factory.Jump());
+            SwitchStates(Factory.Jump(), ref context);
         }
         else if (Ctx.CanDash && (Ctx.Input.DashBufferActive || Ctx.Input.IsDashPressedThisFrame))
         {
             Ctx.DashConsume();
-            SwitchStates(Factory.Dash());
+            SwitchStates(Factory.Dash(), ref context);
         }
         else if (!Ctx.IsOnGround)
         {
-            SwitchStates(Factory.Falling());
+            SwitchStates(Factory.Falling(), ref context);
         }
     }
-    private void UpdateSubstate()
+    private void UpdateSubstate(ref PlayerContext context)
     {
         PlayerBaseState desiredState = GetDesiredState();
         if (CurrentSubState?.GetType() != desiredState?.GetType())
         {
-            SetSubState(desiredState);
+            SetSubState(desiredState, ref context);
         }
 
     }
@@ -46,10 +50,10 @@ public class PlayerGroundedState : PlayerBaseState
             return Factory.Idle();
     }
 
-    public override void InitializeSubState()
+    public override void InitializeSubState(ref PlayerContext context)
     {
         PlayerBaseState desiredState = GetDesiredState();
         if (desiredState != null)
-            SetSubState(desiredState);
+            SetSubState(desiredState, ref context);
     }
 }

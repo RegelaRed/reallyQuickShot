@@ -1,74 +1,72 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour
 {
     #region Private References
-    //reference variables
+    // ------------ reference variables ------------
     private PlayerInputActions _action;
-    //walk
+    // ------------ walk ------------ 
     private Vector2 _currentMovementInput;
     private bool _isMovementPressed;
-    //Look
+    // ------------ Look ------------ 
     private Vector2 _currentLookInput;
-    //sprint
+    // ------------ sprint ------------ 
     private bool _isSprintPressed;
     private bool _sprintToggle = false;
-    //jump
+    // ------------ jump ------------ 
     private float _jumpBufferTimer;
     private bool _isJumpPressedThisFrame;
     private bool _isJumpPressed;
-    //dash
+    // ------------ dash ------------ 
     private float _dashBufferTimer;
     private bool _isDashPressedThisFrame;
     private bool _isDashPressed;
-    //Camera 
+    // ------------ Camera ------------  
     private bool _aimToggle = false;
-    //Attack
+    // ------------ Attack ------------ 
     private bool _attackHeld;
     private bool _attackPressed;
     private bool _reloadPressed;
-
-    //weapon switching
+    // ------------ Weapon switching ------------ 
     private bool _ammoPrevious;
     private bool _ammoNext;
     private bool _switchWeaponPressed;
 
     #endregion
     #region Getters/Setters
-    //Walk
+    // ------------ Walk ------------ 
     public Vector2 CurrentMovementInput { get { return _currentMovementInput; } }
     public bool IsMovementPressed { get { return _isMovementPressed; } }
-    //Sprint
+    // ------------ Sprint ------------ 
     public bool IsSprintPressed { get { return _isSprintPressed; } }
     public bool SprintToggle { get { return _sprintToggle; } }
-    //Jump
+    // ------------ Jump ------------ 
     public float JumpBufferTimer { get { return _jumpBufferTimer; } set { _jumpBufferTimer = value; } }
     public bool JumpBufferActive { get { return _jumpBufferTimer > 0f; } }
     public bool IsJumpPressedThisFrame { get { return _isJumpPressedThisFrame; } }
     public bool IsJumpPressed { get { return _isJumpPressed; } }
-    //Dash
+    // ------------ Dash ------------ 
     public float DashBufferTimer { get { return _dashBufferTimer; } set { _dashBufferTimer = value; } }
     public bool DashBufferActive { get { return _dashBufferTimer > 0f; } }
     public bool IsDashPressedThisFrame { get { return _isDashPressedThisFrame; } }
     public bool IsDashPressed { get { return _isDashPressed; } }
-    //Camera
+    // ------------ Camera ------------ 
     public Vector2 CurrentLookInput { get { return _currentLookInput; } }
-    //Attack
+    // ------------ Attack ------------ 
     public bool AttackHeld { get { return _attackHeld; } }
     public bool AttackPressed { get { return _attackPressed; } }
     public bool ReloadPressed { get { return _reloadPressed; } }
-    //Attack -> Ranged
+    // ------------ Ranged ------------ 
     public bool IsAiming { get { return _attackHeld || _aimToggle; } }
 
-    //weapon switching
+    // ------------ Weapon switching ------------ 
     public bool AmmoPrevious { get { return _ammoPrevious; } }
     public bool AmmoNext { get { return _ammoNext; } }
-
     public bool SwitchWeaponPressed { get { return _switchWeaponPressed; } }
 
     #endregion
+    //------------------------------------------------
     private void Awake()
     {
         _action = new PlayerInputActions();
@@ -106,26 +104,58 @@ public class PlayerInputHandler : MonoBehaviour
         _action.Player.SwitchAmmo.performed += context => OnSwitchAmmo(context);
         _action.Player.SwitchAmmo.canceled += context => OnSwitchAmmo(context);
     }
-
-    private void OnSwitchAmmo(InputAction.CallbackContext context)
+    private void LateUpdate()
     {
-        if (context.performed)
-            _switchWeaponPressed = true;
+        _isJumpPressedThisFrame = false;
+        _isDashPressedThisFrame = false;
+        _attackPressed = false;
+        _ammoNext = false;
+        _ammoPrevious = false;
+        _switchWeaponPressed = false;
+        //delays
+        float T = Time.deltaTime;
+        if (_jumpBufferTimer > 0f) _jumpBufferTimer -= T;
+        if (_dashBufferTimer > 0f) _dashBufferTimer -= T;
     }
 
-    private void OnReolad(InputAction.CallbackContext context)
+
+    public PlayerInputSnapshot CreateSnapshot()
     {
-        _reloadPressed = context.ReadValueAsButton();
+        bool _wasAttackHeld = _attackHeld;
+        PlayerInputSnapshot snapshot = new PlayerInputSnapshot
+        {
+
+            Move = _currentMovementInput,
+            Look = _currentLookInput,
+
+            JumpPressed = _isJumpPressedThisFrame,
+            JumpHeld = _isJumpPressed,
+
+            DashPressed = _isDashPressedThisFrame,
+            DashHeld = _isDashPressed,
+
+            AttackHeld = _attackHeld,
+            AttackPressed = _attackPressed && !_wasAttackHeld,
+            AttackReleased = !_attackPressed && _wasAttackHeld,
+
+            ReloadPressed = _reloadPressed,
+
+            AmmoPrevious = _ammoPrevious,
+            AmmoNext = _ammoNext,
+
+            SwitchWeapon = _switchWeaponPressed
+        };
+        return snapshot;
     }
+
+
+
     #region calback references
+    // ------------ Movement ------------ 
     void ReadMovementInput(InputAction.CallbackContext context)
     {
         _currentMovementInput = context.ReadValue<Vector2>().normalized;
         _isMovementPressed = CurrentMovementInput.x != 0 || CurrentMovementInput.y != 0;
-    }
-    void OnLook(InputAction.CallbackContext context)
-    {
-        _currentLookInput = context.ReadValue<Vector2>();
     }
     void OnSprint(InputAction.CallbackContext context)
     {
@@ -151,11 +181,11 @@ public class PlayerInputHandler : MonoBehaviour
         }
         _isDashPressed = context.ReadValueAsButton();
     }
-    void OnAttack(InputAction.CallbackContext context)
+
+    // ------------ Camera ------------
+    void OnLook(InputAction.CallbackContext context)
     {
-        if (context.performed)
-            _attackPressed = true;
-        _attackHeld = context.ReadValueAsButton();
+        _currentLookInput = context.ReadValue<Vector2>();
     }
     void OnAimEnabled(InputAction.CallbackContext context)
     {
@@ -163,6 +193,25 @@ public class PlayerInputHandler : MonoBehaviour
         {
             _aimToggle = !_aimToggle;
         }
+    }
+
+    //------------ Attack ------------
+    void OnAttack(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            _attackPressed = true;
+        _attackHeld = context.ReadValueAsButton();
+    }
+    private void OnReolad(InputAction.CallbackContext context)
+    {
+        _reloadPressed = context.ReadValueAsButton();
+    }
+
+    // ------------ Ammo/Weapon Switch ------------
+    private void OnSwitchAmmo(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            _switchWeaponPressed = true;
     }
     private void OnWeapon1(InputAction.CallbackContext context)
     {
@@ -175,21 +224,7 @@ public class PlayerInputHandler : MonoBehaviour
             _ammoNext = true;
     }
     #endregion
-    //playerInput requirements
+    //-------- New Player Input System requirements ------------
     public void OnEnable() { _action.Player.Enable(); }
     public void OnDisable() { _action.Player.Disable(); }
-
-    private void LateUpdate()
-    {
-        _isJumpPressedThisFrame = false;
-        _isDashPressedThisFrame = false;
-        _attackPressed = false;
-        _ammoNext = false;
-        _ammoPrevious = false;
-        _switchWeaponPressed = false;
-        //delays
-        float T = Time.deltaTime;
-        if (_jumpBufferTimer > 0f) _jumpBufferTimer -= T;
-        if (_dashBufferTimer > 0f) _dashBufferTimer -= T;
-    }
 }

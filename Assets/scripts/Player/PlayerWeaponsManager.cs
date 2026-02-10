@@ -3,75 +3,114 @@ using UnityEngine;
 
 public class PlayerWeaponsManager : MonoBehaviour
 {
-    [SerializeField] private PlayerController _playercontroller;
+    // ─────────────── Scene References ─────────────── 
+
+    [Header("Scene References")]
+    [SerializeField] private PlayerController _playerController;
     [SerializeField] private PlayerInputHandler _playerInput;
     [SerializeField] private Spawner _spawner;
+
     [SerializeField] private Transform _weaponPositionIdle;
     [SerializeField] private Transform _weaponPositionActive;
+
+    // ─────────────── Weapon Data ─────────────── 
+
+    [Header("Weapon List")]
     [SerializeField] private List<GameObject> _weaponPrefabs;
 
-    private List<WeaponsBase> _weaponList;
+    private readonly List<WeaponsBase> _weaponList = new();
     private int _currentWeaponIndex;
     private WeaponsBase _currentWeapon;
 
+    // ─────────────── Input ─────────────── 
+
     public WeaponInput InputSnapshot { get; private set; }
 
+    // ─────────────── Public Access ─────────────── 
 
-    public Transform WeaponPositionIdle { get { return _weaponPositionIdle; } }
-    public Transform WeaponPositionActive { get { return _weaponPositionActive; } }
-    public PlayerController Controller { get { return _playercontroller; } }
-    public PlayerInputHandler Input { get { return _playerInput; } }
-    public Spawner Spawner { get { return _spawner; } }
+    public Transform WeaponPositionIdle => _weaponPositionIdle;
+    public Transform WeaponPositionActive => _weaponPositionActive;
+
+    public PlayerController Controller => _playerController;
+    public PlayerInputHandler Input => _playerInput;
+    public Spawner Spawner => _spawner;
+
+    // ─────────────── Unity Lifecycle ─────────────── 
 
     private void Awake()
     {
-        _weaponList = new List<WeaponsBase>();
+        _playerController ??= GetComponent<PlayerController>();
+        _playerInput ??= GetComponent<PlayerInputHandler>();
+        _spawner ??= GetComponent<Spawner>();
 
-        if (_playercontroller == null) _playercontroller = GetComponent<PlayerController>();
-        if (_playerInput == null) _playerInput = GetComponent<PlayerInputHandler>();
-        if (_spawner == null) _spawner = GetComponent<Spawner>();
-
-        foreach (var prefab in _weaponPrefabs)
-        {
-            // Debug.Log($"Avalable prefabs {prefab.name}");
-            GameObject weaponObj = Instantiate(prefab, _weaponPositionIdle);
-            WeaponsBase weapon = weaponObj.GetComponent<WeaponsBase>();
-            if (weapon != null)
-            {
-                _weaponList.Add(weapon);
-                weapon.OnInitialize(this);
-                weapon.UnEquip();
-            }
-            else
-            {
-                Destroy(weaponObj);
-            }
-        }
+        InitializeWeapons();
         EquipWeapon(0);
     }
-    void Update()
+    private void Update()
     {
+        CaptureInput();
+
+        _currentWeapon?.UpdateWeapon(InputSnapshot);
+
+        if (_playerInput.SwitchWeaponPressed)
+            SwitchWeapon();
+    }
+
+    // ─────────────── Initialization ─────────────── 
+
+    private void InitializeWeapons()
+    {
+        foreach (var prefab in _weaponPrefabs)
+        {
+            GameObject weaponObj = Instantiate(prefab, _weaponPositionIdle);
+            WeaponsBase weapon = weaponObj.GetComponent<WeaponsBase>();
+
+            if (weapon == null)
+            {
+                Destroy(weaponObj);
+                continue;
+            }
+
+            _weaponList.Add(weapon);
+            weaponObj.transform.localPosition = Vector3.zero;
+            weapon.OnInitialize(this);
+            weapon.UnEquip();
+        }
+    }
+
+    // ─────────────── Input ─────────────── 
+
+    private void CaptureInput()
+    {
+        bool _wasAttackHeld = Input.AttackHeld;
         InputSnapshot = new WeaponInput
         {
+            AttackPressed = Input.AttackPressed && !_wasAttackHeld,
             AttackHeld = Input.AttackHeld,
-            AttackReleased = !Input.AttackHeld,
+            AttackReleased = !Input.AttackHeld && _wasAttackHeld,
+
             ReloadPressed = Input.ReloadPressed,
             AmmoNext = Input.AmmoNext
         };
-
-        if (_currentWeapon != null) _currentWeapon.UpdateWeapon(InputSnapshot);
-        if (_playerInput.SwitchWeaponPressed) SwitchWeapon();
+        _wasAttackHeld = Input.AttackHeld;
     }
+
+    // ─────────────── Weapon Switching ─────────────── 
+
     private void SwitchWeapon()
     {
-        int index = (_currentWeaponIndex + 1) % _weaponList.Count;
-        EquipWeapon(index);
+        int nextIndex = (_currentWeaponIndex + 1) % _weaponList.Count;
+        EquipWeapon(nextIndex);
     }
     private void EquipWeapon(int index)
     {
-        if (index < 0 || index >= _weaponList.Count) { Debug.Log("IndexOutOfRangeException"); return; }
+        if (index < 0 || index >= _weaponList.Count)
+        {
+            Debug.LogError("Weapon index out of range");
+            return;
+        }
 
-        if (_currentWeapon != null) _currentWeapon.UnEquip();
+        _currentWeapon?.UnEquip();
 
         _currentWeaponIndex = index;
         _currentWeapon = _weaponList[index];
