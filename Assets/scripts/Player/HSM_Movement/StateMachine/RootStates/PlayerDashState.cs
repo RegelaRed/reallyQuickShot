@@ -5,39 +5,26 @@ public class PlayerDashState : PlayerBaseState
 {
     public PlayerDashState(PlayerController _ctx, PlayerStateFactory _factory) : base(_ctx, _factory)
     { }
-
-    public override void EnterState()
+    public override void EnterState(PlayerContext context)
     {
         if (CurrentSubState != null)
-            CurrentSubState.ExitStates();
+            CurrentSubState.ExitStates(context);
 
-        Vector3 dashDirection;
-        if (Ctx.CurrentCameraState is PlayerAimCamera)
-            dashDirection = Ctx.Orientation.forward;
-        else
-            dashDirection = Ctx.FaceDirection.forward;
-
-        Ctx.PlayerMotor.SetGravity(Ctx.DashGravity);
-        Ctx.PlayerMotor.StartDash(Ctx.Variables.dashDistance, Ctx.Variables.dashDuration, dashDirection);
-        Ctx.PlayerMotor.SetUpwardVelocity(Ctx.InitialDashVelocity);
+        context.PlayerMotor.SetGravity(context.DashGravity);
+        context.PlayerMotor.StartDash(context.Variables.dashDistance, context.Variables.dashDuration, context.DashDirection);
+        context.PlayerMotor.SetUpwardVelocity(context.InitialDashVelocity);
     }
-    public override void ExitState() { }
-    public override void UpdateState() { CheckSwitchState(); }
-    public override void CheckSwitchState()
+    public override void ExitState(PlayerContext context) { }
+    public override void UpdateState(PlayerContext context) { CheckSwitchState(context); }
+    public override void CheckSwitchState(PlayerContext context)
     {
-        if (Ctx.PlayerMotor.IsDashing)
+        if (context.PlayerMotor.IsDashing)
             return;
 
-        if (Ctx.IsOnGround)
-            SwitchStates(Factory.Grounded());
+        if (context.IsGrounded)
+            SwitchStates(Factory.Grounded(), context);
         else
-            SwitchStates(Factory.Falling());
+            SwitchStates(Factory.Falling(), context);
     }
-    public override void InitializeSubState() { }
-
-    public IEnumerator StartDash()
-    {
-        yield return new WaitForSeconds(Ctx.Variables.dashDuration);
-        ExitState();
-    }
+    public override void InitializeSubState(PlayerContext context) { }
 }

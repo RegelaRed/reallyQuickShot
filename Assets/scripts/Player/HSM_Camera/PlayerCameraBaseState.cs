@@ -36,16 +36,16 @@ public abstract class PlayerCameraBaseState
     }
 
     //Default States
-    public abstract void EnterState();
-    public abstract void ExitState();
-    public abstract void UpdateState(PlayerContext ctx);
-    public abstract void CheckSwitchState();
-    protected void SwitchStates(PlayerCameraBaseState newState)
+    public abstract void EnterState(PlayerContext context);
+    public abstract void ExitState(PlayerContext context);
+    public abstract void UpdateState(PlayerContext context);
+    public abstract void CheckSwitchState(PlayerContext context);
+    protected void SwitchStates(PlayerCameraBaseState newState, PlayerContext context)
     {
         newState.Yaw = Yaw;
         newState.Pitch = Pitch;
-        ExitState();
-        newState.EnterState();
+        ExitState(context);
+        newState.EnterState(context);
 
         if (IsRootState)
         {
@@ -53,30 +53,30 @@ public abstract class PlayerCameraBaseState
         }
         else if (_currentSubState != null)
         {
-            _currentSuperState.SetSubState(newState);
+            _currentSuperState.SetSubState(newState, context);
         }
     }
-    public void UpdateStates(PlayerContext ctx)
+    public void UpdateStates(PlayerContext context)
     {
-        UpdateState(ctx);
+        UpdateState(context);
         if (_currentSubState != null)
-            _currentSubState.UpdateStates(ctx);
+            _currentSubState.UpdateStates(context);
     }
-    public void ExitStates()
+    public void ExitStates(PlayerContext context)
     {
-        ExitState();
+        ExitState(context);
         if (_currentSubState != null)
-            _currentSubState.ExitStates();
+            _currentSubState.ExitStates(context);
     }
-    public void SetSuperstate(PlayerCameraBaseState newState)
+    public void SetSuperstate(PlayerCameraBaseState newState, PlayerContext context)
     {
         _currentSuperState = newState;
     }
-    public void SetSubState(PlayerCameraBaseState newState)
+    public void SetSubState(PlayerCameraBaseState newState, PlayerContext context)
     {
         _currentSubState = newState;
-        _currentSubState.SetSuperstate(this);
-        _currentSubState.EnterState();
+        _currentSubState.SetSuperstate(this, context);
+        _currentSubState.EnterState(context);
     }
 
     //CameraSpecific Functions

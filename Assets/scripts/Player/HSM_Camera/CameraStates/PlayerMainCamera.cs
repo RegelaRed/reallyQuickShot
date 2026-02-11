@@ -4,25 +4,29 @@ public class PlayerMainCamera : PlayerCameraBaseState
     public PlayerMainCamera(PlayerController _ctx, PlayerCameraStateFactory _factory)
     : base(_ctx, _factory)
     {
-        SetSensitivity(Ctx.Variables.horizontalCameraSensitivity, Ctx.Variables.verticalCameraSensitivity);
-        SetPitchLimits(Ctx.Variables.mainCameraPitchMin, Ctx.Variables.mainCameraPitchMax);
+
     }
-    public override void EnterState() { Ctx.MainCamera.SetActive(true); }
-    public override void ExitState() { Ctx.MainCamera.SetActive(false); }
-    public override void UpdateState()
+    public override void EnterState(PlayerContext context)
     {
-        HandleRotation(Ctx.Input.CurrentLookInput);
-        FaceDirection();
-        CheckSwitchState();
+        SetSensitivity(context.Variables.horizontalCameraSensitivity, context.Variables.verticalCameraSensitivity);
+        SetPitchLimits(context.Variables.mainCameraPitchMin, context.Variables.mainCameraPitchMax);
+        Ctx.MainCamera.SetActive(true);
     }
-    public override void CheckSwitchState()
+    public override void ExitState(PlayerContext context) { Ctx.MainCamera.SetActive(false); }
+    public override void UpdateState(PlayerContext context)
     {
-        if (Ctx.Input.IsAiming)
-            SwitchStates(Factory.AimCamera());
+        HandleRotation(context.Input.Look);
+        FaceDirection(context);
+        CheckSwitchState(context);
     }
-    private void FaceDirection()
+    public override void CheckSwitchState(PlayerContext context)
     {
-        Vector3 moveDir = Ctx.PlayerMotor.FinalMoveVector;
+        if (context.Input.AimMode)
+            SwitchStates(Factory.AimCamera(), context);
+    }
+    private void FaceDirection(PlayerContext context)
+    {
+        Vector3 moveDir = context.PlayerMotor.FinalMoveVector;
         moveDir.y = 0f;
         if (moveDir.sqrMagnitude > 0.1f)
         {
@@ -30,7 +34,7 @@ public class PlayerMainCamera : PlayerCameraBaseState
             Ctx.FaceDirection.rotation = Quaternion.Slerp(
                 Ctx.FaceDirection.rotation,
                 targetRot,
-                Ctx.Variables.playerBodyRotationSpeed
+                context.Variables.playerBodyRotationSpeed
             );
         }
     }

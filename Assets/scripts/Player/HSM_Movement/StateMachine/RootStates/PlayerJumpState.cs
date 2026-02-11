@@ -2,75 +2,70 @@ using UnityEngine;
 
 public class PlayerJumpState : PlayerBaseState
 {
-    public PlayerJumpState(PlayerController _ctx, PlayerStateFactory _factory)
-    : base(_ctx, _factory) { }
 
+    public PlayerJumpState(PlayerController _ctx, PlayerStateFactory _factory)
+        : base(_ctx, _factory) { }
     bool _jumpCutthisFrame;
     float _jumpExitTimer;
-    public override void EnterState()
+    public override void EnterState(PlayerContext context)
     {
         _jumpCutthisFrame = false;
-        _jumpExitTimer = Ctx.Variables.maxJumpTime;
-        Ctx.PlayerMotor.SetGravity(Ctx.JumpGravity);
+        _jumpExitTimer = context.Variables.maxJumpTime;
+        context.PlayerMotor.SetGravity(context.JumpGravity);
 
-        if (Ctx.PlayerMotor.CurrentSpeed <= 0f)
-            Ctx.PlayerMotor.SetSpeed(Ctx.Input.SprintToggle ? Ctx.Variables.sprintSpeed : Ctx.Variables.walkSpeed);
+        if (context.PlayerMotor.CurrentSpeed <= 0f)
+            context.PlayerMotor.SetSpeed(context.Input.SprintToggle ? context.Variables.sprintSpeed : context.Variables.walkSpeed);
 
-        Ctx.PlayerMotor.SetUpwardVelocity(Ctx.InitialJumpVelocity);
+        context.PlayerMotor.SetUpwardVelocity(context.InitialJumpVelocity);
 
-        InitializeSubState();
+        InitializeSubState(context);
     }
-    public override void UpdateState()
+    public override void UpdateState(PlayerContext context)
     {
         if (_jumpExitTimer > 0f) _jumpExitTimer -= Time.deltaTime;
-        Ctx.PlayerMotor.SetAirMovementInput(Ctx.Input.CurrentMovementInput);
-        CutJump();
-        CheckSwitchState();
-        UpdateSubstate();
+        context.PlayerMotor.SetAirMovementInput(context);
+        CutJump(context);
+        CheckSwitchState(context);
+        UpdateSubstate(context);
     }
 
-    private void CutJump()
+    private void CutJump(PlayerContext context)
     {
-        if (!_jumpCutthisFrame && !Ctx.Input.IsJumpPressed && Ctx.PlayerMotor.VerticalVelocity > 0)
+        if (!_jumpCutthisFrame && !context.Input.JumpPressed && context.PlayerMotor.VerticalVelocity > 0)
         {
-            Ctx.PlayerMotor.SetUpwardVelocity(Ctx.PlayerMotor.VerticalVelocity * 0.5f);
+            context.PlayerMotor.SetUpwardVelocity(context.PlayerMotor.VerticalVelocity * 0.5f);
             _jumpCutthisFrame = true;
         }
     }
 
-
-    public override void ExitState()
-    {
-        Ctx.TimeLeftOnGround = 0.1f;
-    }
-    public override void CheckSwitchState()
+    public override void ExitState(PlayerContext context) { }
+    public override void CheckSwitchState(PlayerContext context)
     {
         if (_jumpExitTimer <= 0.01f)
         {
-
-            if (Ctx.IsOnGround)
-                SwitchStates(Factory.Grounded());
+            if (context.IsGrounded)
+                SwitchStates(Factory.Grounded(), context);
             else
-                SwitchStates(Factory.Falling());
+                SwitchStates(Factory.Falling(), context);
         }
-        else if (Ctx.CanDash && Ctx.Input.IsDashPressedThisFrame)
+        else if (DashRules.CanDash(context) && context.Input.DashPressed)
         {
-            Ctx.DashConsume();
-            SwitchStates(Factory.Dash());
+            DashRules.Consume(context);
+            SwitchStates(Factory.Dash(), context);
         }
     }
-    public override void InitializeSubState()
+    public override void InitializeSubState(PlayerContext context)
     {
-        if (Ctx.PlayerMotor.VerticalVelocity > 0)
-            SetSubState(Factory.JumpAscending());
+        if (context.PlayerMotor.VerticalVelocity > 0)
+            SetSubState(Factory.JumpAscending(), context);
     }
 
-    private void UpdateSubstate()
+    private void UpdateSubstate(PlayerContext context)
     {
-        if (Ctx.PlayerMotor.VerticalVelocity <= 0 && CurrentSubState?.GetType() != typeof(PlayerJumpDescending))
+        if (context.PlayerMotor.VerticalVelocity <= 0 && CurrentSubState?.GetType() != typeof(PlayerJumpDescending))
         {
-            CurrentSubState?.ExitState();
-            SetSubState(Factory.JumpDescending());
+            CurrentSubState?.ExitState(context);
+            SetSubState(Factory.JumpDescending(), context);
         }
     }
 }

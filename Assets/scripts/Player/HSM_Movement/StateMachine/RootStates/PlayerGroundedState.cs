@@ -4,56 +4,68 @@ public class PlayerGroundedState : PlayerBaseState
 {
     public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory) : base(_ctx, _factory)
     { }
-    public override void EnterState(ref PlayerContext context)
+    // ------------ Enter State ------------
+    public override void EnterState(PlayerContext context)
     {
-        Ctx.PlayerMotor.SetGravity(context.Variables.gravity);
-        InitializeSubState(ref context);
+        context.PlayerMotor.SetGravity(context.Variables.gravity);
+        InitializeSubState(context);
     }
-    public override void ExitState(ref PlayerContext context) { Ctx.TimeLeftOnGround = Ctx.Variables.jumpBufferTime; }
-    public override void UpdateState(ref PlayerContext context)
+    // ------------ Enter State ------------
+    public override void ExitState(PlayerContext context)
     {
-        CheckSwitchState(ref context);
-        UpdateSubstate(ref context);
+        context.InputBuffer.SetCyoteTime(context.Variables.jumpBufferTime);
     }
-    public override void CheckSwitchState(ref PlayerContext context)
+
+    public override void UpdateState(PlayerContext context)
     {
-        if (context.Input.JumpPressed && (Ctx.Input.JumpBufferActive || Ctx.Input.IsJumpPressedThisFrame))
+        CheckSwitchState(context);
+        UpdateSubstate(context);
+    }
+
+    public override void CheckSwitchState(PlayerContext context)
+    {
+        // ------------ Jump ------------
+        if (context.InputBuffer.JumpBufferActive && JumpRules.CanJump(context))
         {
-            SwitchStates(Factory.Jump(), ref context);
+            SwitchStates(Factory.Jump(), context);
         }
-        else if (Ctx.CanDash && (Ctx.Input.DashBufferActive || Ctx.Input.IsDashPressedThisFrame))
+        // ------------ Dash ------------
+        else if (context.InputBuffer.DashBufferActive && DashRules.CanDash(context))
         {
-            Ctx.DashConsume();
-            SwitchStates(Factory.Dash(), ref context);
+            DashRules.Consume(context);
+
+            SwitchStates(Factory.Dash(), context);
         }
-        else if (!Ctx.IsOnGround)
+        else if (!context.IsGrounded)
         {
-            SwitchStates(Factory.Falling(), ref context);
+            SwitchStates(Factory.Falling(), context);
         }
     }
-    private void UpdateSubstate(ref PlayerContext context)
+
+    private void UpdateSubstate(PlayerContext context)
     {
-        PlayerBaseState desiredState = GetDesiredState();
+        PlayerBaseState desiredState = GetDesiredState(context);
         if (CurrentSubState?.GetType() != desiredState?.GetType())
         {
-            SetSubState(desiredState, ref context);
+            SetSubState(desiredState, context);
         }
 
     }
-    private PlayerBaseState GetDesiredState()
+
+    private PlayerBaseState GetDesiredState(PlayerContext context)
     {
-        if (Ctx.Input.IsMovementPressed && Ctx.Input.SprintToggle)
+        if (context.Input.MovePressed && context.Input.SprintToggle)
             return Factory.Sprint();
-        else if (Ctx.Input.IsMovementPressed)
+        else if (context.Input.MovePressed)
             return Factory.Walk();
         else
             return Factory.Idle();
     }
 
-    public override void InitializeSubState(ref PlayerContext context)
+    public override void InitializeSubState(PlayerContext context)
     {
-        PlayerBaseState desiredState = GetDesiredState();
+        PlayerBaseState desiredState = GetDesiredState(context);
         if (desiredState != null)
-            SetSubState(desiredState, ref context);
+            SetSubState(desiredState, context);
     }
 }

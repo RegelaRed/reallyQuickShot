@@ -1,6 +1,3 @@
-using TMPro;
-using UnityEngine;
-
 public abstract class PlayerBaseState
 {
     private bool _isRootState = false;
@@ -19,18 +16,18 @@ public abstract class PlayerBaseState
         _ctx = ctx;
         _factory = stateFactory;
     }
-    public abstract void EnterState(ref PlayerContext context);
-    public abstract void ExitState(ref PlayerContext context);
-    public abstract void UpdateState(ref PlayerContext context);
-    public abstract void CheckSwitchState(ref PlayerContext context);
-    public abstract void InitializeSubState(ref PlayerContext context);
-    protected void SwitchStates(PlayerBaseState newState, ref PlayerContext context)
+    public abstract void EnterState(PlayerContext context);
+    public abstract void ExitState(PlayerContext context);
+    public abstract void UpdateState(PlayerContext context);
+    public abstract void CheckSwitchState(PlayerContext context);
+    public abstract void InitializeSubState(PlayerContext context);
+    protected void SwitchStates(PlayerBaseState newState, PlayerContext context)
     {
         //current state exit
-        ExitState(ref context);
+        ExitState(context);
 
         //new state enter
-        newState.EnterState(ref context);
+        newState.EnterState(context);
 
         if (IsRootState)
         {
@@ -38,31 +35,31 @@ public abstract class PlayerBaseState
             _ctx.CurrentMovementState = newState;
         }
         else if (_currentSuperState != null)
-            _currentSuperState.SetSubState(newState, ref context);
+            _currentSuperState.SetSubState(newState, context);
     }
     /// <summary>Update SubstatesStates if any</summary>
-    public void UpdateStates(ref PlayerContext context)
+    public void UpdateStates(PlayerContext context)
     {
-        UpdateState(ref context);
+        UpdateState(context);
         if (_currentSubState != null)
-            _currentSubState.UpdateStates(ref context);
+            _currentSubState.UpdateStates(context);
     }
     /// <summary>Exit All SubStates if any</summary>
-    public void ExitStates(ref PlayerContext context)
+    public void ExitStates(PlayerContext context)
     {
-        ExitState(ref context);
+        ExitState(context);
         if (_currentSubState != null)
-            _currentSubState.ExitStates(ref context);
+            _currentSubState.ExitStates(context);
     }
     protected void SetSuperState(PlayerBaseState newSuperState)
     {
         _currentSuperState = newSuperState;
     }
-    protected void SetSubState(PlayerBaseState newSubState, ref PlayerContext context)
+    protected void SetSubState(PlayerBaseState newSubState, PlayerContext context)
     {
         _currentSubState = newSubState;
         newSubState.SetSuperState(this);
-        newSubState.EnterState(ref context);
+        newSubState.EnterState(context);
     }
 }
 /// Template

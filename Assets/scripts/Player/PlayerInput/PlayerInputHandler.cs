@@ -121,12 +121,14 @@ public class PlayerInputHandler : MonoBehaviour
 
     public PlayerInputSnapshot CreateSnapshot()
     {
-        bool _wasAttackHeld = _attackHeld;
-        PlayerInputSnapshot snapshot = new PlayerInputSnapshot
+        return new PlayerInputSnapshot
         {
-
             Move = _currentMovementInput,
             Look = _currentLookInput,
+            MovePressed = _isMovementPressed,
+
+            SprintPressed = _isSprintPressed,
+            SprintToggle = _sprintToggle,
 
             JumpPressed = _isJumpPressedThisFrame,
             JumpHeld = _isJumpPressed,
@@ -135,17 +137,16 @@ public class PlayerInputHandler : MonoBehaviour
             DashHeld = _isDashPressed,
 
             AttackHeld = _attackHeld,
-            AttackPressed = _attackPressed && !_wasAttackHeld,
-            AttackReleased = !_attackPressed && _wasAttackHeld,
+            AttackPressed = _attackPressed,
+            AttackReleased = !_attackPressed && _attackHeld,
 
             ReloadPressed = _reloadPressed,
 
             AmmoPrevious = _ammoPrevious,
             AmmoNext = _ammoNext,
-
-            SwitchWeapon = _switchWeaponPressed
+            SwitchWeapon = _switchWeaponPressed,
+            AimMode = _aimToggle
         };
-        return snapshot;
     }
 
 

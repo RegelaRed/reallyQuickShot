@@ -1,43 +1,56 @@
-public sealed class PlayerInputBuffer
+
+public class PlayerInputBuffer
 {
-    private float _jumpBuffer;
-    private float _dashBuffer;
+    private float _jumpBufferTimer;
+    private float _dashBufferTimer;
 
-    private readonly float _jumpBufferTime;
-    private readonly float _dashBufferTime;
 
-    public PlayerInputBuffer(float jumpBufferTime, float dashBufferTime)
+    private float _jumpBufferTime;
+    private float _dashBufferTime;
+
+    public bool JumpBufferActive => _jumpBufferTimer > 0f;
+    public bool DashBufferActive => _dashBufferTimer > 0f;
+
+
+    public PlayerInputBuffer(float jumpTime, float dashTime)
     {
-        _jumpBufferTime = jumpBufferTime;
-        _dashBufferTime = dashBufferTime;
-    }
-
-    public void Tick(float deltaTime)
-    {
-        if (_jumpBuffer > 0f) _jumpBuffer -= deltaTime;
-        if (_dashBuffer > 0f) _dashBuffer -= deltaTime;
+        _jumpBufferTime = jumpTime;
+        _dashBufferTime = dashTime;
     }
 
     public void Register(PlayerInputSnapshot input)
     {
         if (input.JumpPressed)
-            _jumpBuffer = _jumpBufferTime;
+            _jumpBufferTimer = _jumpBufferTime;
 
         if (input.DashPressed)
-            _dashBuffer = _dashBufferTime;
+            _dashBufferTimer = _dashBufferTime;
     }
 
-    public bool ConsumeJump()
+    public void Tick(float deltaTime)
     {
-        if (_jumpBuffer <= 0f) return false;
-        _jumpBuffer = 0f;
-        return true;
+        if (_jumpBufferTimer > 0f)
+            _jumpBufferTimer -= deltaTime;
+
+        if (_dashBufferTimer > 0f)
+            _dashBufferTimer -= deltaTime;
+
+
+    }
+    // ------------ Jump ------------
+    public void ConsumeJump()
+    {
+        _jumpBufferTimer = 0f;
+    }
+    public void SetCyoteTime(float jumpBufferTime)
+    {
+        _jumpBufferTimer = jumpBufferTime;
     }
 
-    public bool ConsumeDash()
+    // ------------ Dash ------------
+    public void ConsumeDash()
     {
-        if (_dashBuffer <= 0f) return false;
-        _dashBuffer = 0f;
-        return true;
+        _dashBufferTimer = 0f;
     }
+
 }

@@ -13,7 +13,6 @@ public class Ranged_Bow : WeaponsBase
     private int _currentAmmo;
     private float _charge;
 
-    private bool _attackHeldActive;
     private bool _idlePos = true;
 
     private bool IsReloading => _reloadTimer > 0f;
@@ -38,13 +37,11 @@ public class Ranged_Bow : WeaponsBase
 
         if (input.AttackHeld)
         {
-            _attackHeldActive = true;
             ChargeAttack();
             SetActivePose();
         }
         else if (input.AttackReleased)
         {
-            _attackHeldActive = false;
             ReleaseAttack();
             SetIdlePose();
         }

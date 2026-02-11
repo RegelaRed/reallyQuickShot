@@ -5,7 +5,11 @@ public struct PlayerInputSnapshot
 {
     // ------------ Movement ------------ 
     public Vector2 Move;
+    public bool MovePressed;
     public Vector2 Look;
+    // ------------ Sprint ------------  
+    public bool SprintPressed;
+    public bool SprintToggle;
     // ------------ Jump ------------ 
     public bool JumpPressed;
     public bool JumpHeld;
@@ -21,4 +25,6 @@ public struct PlayerInputSnapshot
     public bool AmmoPrevious;
     public bool AmmoNext;
     public bool SwitchWeapon;
+    // -------- Aim Mode --------
+    public bool AimMode;
 }

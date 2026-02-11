@@ -4,21 +4,26 @@ public class PlayerAimCamera : PlayerCameraBaseState
     public PlayerAimCamera(PlayerController _ctx, PlayerCameraStateFactory _factory)
     : base(_ctx, _factory)
     {
-        SetSensitivity(Ctx.Variables.horizontalCameraSensitivity, Ctx.Variables.verticalCameraSensitivity);
-        SetPitchLimits(Ctx.Variables.aimCameraPitchMin, Ctx.Variables.aimCameraPitchMax);
+
     }
-    public override void EnterState() { Ctx.AimCamera.SetActive(true); }
-    public override void ExitState() { Ctx.AimCamera.SetActive(false); }
-    public override void UpdateState()
+    public override void EnterState(PlayerContext context)
     {
-        HandleRotation(Ctx.Input.CurrentLookInput);
+        SetSensitivity(context.Variables.horizontalCameraSensitivity, context.Variables.verticalCameraSensitivity);
+        SetPitchLimits(context.Variables.aimCameraPitchMin, context.Variables.aimCameraPitchMax);
+
+        Ctx.AimCamera.SetActive(true);
+    }
+    public override void ExitState(PlayerContext context) { Ctx.AimCamera.SetActive(false); }
+    public override void UpdateState(PlayerContext context)
+    {
+        HandleRotation(context.Input.Look);
         FaceDirection();
-        CheckSwitchState();
+        CheckSwitchState(context);
     }
-    public override void CheckSwitchState()
+    public override void CheckSwitchState(PlayerContext context)
     {
-        if (!Ctx.Input.IsAiming)
-            SwitchStates(Factory.MainCamera());
+        if (!context.Input.AimMode)
+            SwitchStates(Factory.MainCamera(), context);
     }
     private void FaceDirection()
     {

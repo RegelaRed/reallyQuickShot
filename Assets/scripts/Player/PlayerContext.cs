@@ -1,34 +1,46 @@
 using UnityEngine;
-public struct PlayerContext
+
+public class PlayerContext
 {
     public PlayerInputSnapshot Input;
-    public PlayerVariables Variables;
     public PlayerInputBuffer InputBuffer;
 
-    public Vector3 Velocity;
+    public PlayerVariables Variables;
+    public PlayerMotor PlayerMotor;
+
+
+    // -------- Ground --------
     public bool IsGrounded;
 
-    public float JumpCooldown;
+    // -------- Jump -------- 
+    public float InitialJumpVelocity;
+    public float JumpGravity;
+    public float JumpIntervalTimer;
 
-    public float DashCooldown;
-    public float DashRegenTimer;
+    // -------- Dash --------
     public int DashCharges;
-}
-public static class DashRules
-{
-    public static bool CanDash(in PlayerContext ctx) => ctx.DashCharges > 0 && ctx.DashCooldown <= 0f;
-    public static void Consume(ref PlayerContext ctx, ref PlayerVariables var)
+    public float InitialDashVelocity;
+    public float DashGravity;
+    public float DashIntervalTimer;
+    public float DashRegenTimer;
+
+    public Vector3 DashDirection;
+
+    // -------- Tiemrs --------
+    public float DeltaTime;
+    public void AbilityTimers()
     {
-        ctx.DashCharges--;
-        ctx.DashCooldown = var.dashInterval;
-        ctx.DashRegenTimer = var.dashRegenTime;
-    }
-}
-public static class JumpRules
-{
-    public static bool CanJump(in PlayerContext ctx) => ctx.JumpCooldown <= 0f && ctx.IsGrounded;
-    public static void Consume(ref PlayerContext ctx, ref PlayerVariables var)
-    {
-        ctx.JumpCooldown = var.jumpInterval;
+        if (JumpIntervalTimer > 0f)
+            JumpIntervalTimer -= DeltaTime;
+
+        if (DashIntervalTimer > 0f)
+            DashIntervalTimer -= DeltaTime;
+
+        if (DashRegenTimer > 0f)
+        {
+            DashRegenTimer -= DeltaTime;
+            if (DashRegenTimer <= 0f)
+                DashRules.Regenerate(this);
+        }
     }
 }

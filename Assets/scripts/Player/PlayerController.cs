@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    #region References
-    // ─────────────── References ─────────────── 
+    #region erences
+    // ─────────────── erences ─────────────── 
 
-    [Header("Scene References")]
+    [Header("Scene erences")]
     [SerializeField] private CharacterController _characterController;
     [SerializeField] private Transform _orientation;
     [SerializeField] private Transform _playerCameraPosition;
@@ -34,27 +34,6 @@ public class PlayerController : MonoBehaviour
     private PlayerCameraBaseState _currentCameraState;
     private PlayerCameraStateFactory _cameraFactory;
 
-    private Quaternion _currentCameraRotation;
-
-
-    // ─────────────── Jump ─────────────── 
-    //delete
-    private float _cyoteTimer;
-    //keep
-    private float _initialJumpVelocity;
-    private float _jumpGravity;
-
-
-    // ─────────────── Dash ─────────────── 
-
-    //delete
-    private float _dashIntervalTimer;
-    private float _dashRegenTimer;
-    private int _currentDashCharges;
-    //keep 
-    private float _initialDashVelocity;
-    private float _dashGravity;
-
     #endregion
     #region Getters/Setters
     // ─────────────── Properties ─────────────── 
@@ -66,10 +45,7 @@ public class PlayerController : MonoBehaviour
 
     public GameObject MainCamera => _mainCamera;
     public GameObject AimCamera => _aimCamera;
-    public PlayerVariables Variables => _playerVariables;
 
-    public PlayerInputHandler Input => _input;
-    public PlayerMotor PlayerMotor => _playerMotor;
 
     public PlayerBaseState CurrentMovementState
     {
@@ -82,155 +58,105 @@ public class PlayerController : MonoBehaviour
         get => _currentCameraState;
         set => _currentCameraState = value;
     }
-
-    public Quaternion CurrentCameraRotation
-    {
-        get => _currentCameraRotation;
-        set => _currentCameraRotation = value;
-    }
-
-
-    // ─────────────── Jump Properties ─────────────── 
-
-    public float InitialJumpVelocity => _initialJumpVelocity;
-    public float JumpGravity => _jumpGravity;
-
-    public float TimeLeftOnGround
-    {
-        get => _cyoteTimer;
-        set => _cyoteTimer = value;
-    }
-
-    public bool CyoteTrue => _cyoteTimer < 0;
-
-
-    // ─────────────── Dash Properties ─────────────── 
-
-    public float DashCooldownTimer
-    {
-        get => _dashIntervalTimer;
-        set => _dashIntervalTimer = value;
-    }
-
-    public int AvalableDashCharges => _currentDashCharges;
-
-    public bool CanDash =>
-        _dashIntervalTimer <= 0f && _currentDashCharges > 0;
-
-    public float InitialDashVelocity => _initialDashVelocity;
-    public float DashGravity => _dashGravity;
-
-
-    // ─────────────── Ground ─────────────── 
-
-    public bool IsOnGround => Controller.isGrounded;
-
     #endregion
+
     #region Update Methods
     // ─────────────── Unity Lifecycle ─────────────── 
 
     private void Awake()
     {
         HideMouse();
-        //Context
-        _playerContext = new PlayerContext();
 
         _input ??= GetComponent<PlayerInputHandler>();
-        _inputBuffer = new PlayerInputBuffer(_playerVariables.jumpBufferTime, _playerVariables.dashBufferTimer);
-
         _playerMotor ??= GetComponent<PlayerMotor>();
+
+        //Context
+        _inputBuffer = new PlayerInputBuffer(_playerVariables.jumpBufferTime, _playerVariables.dashBufferTimer);
+        _playerContext = new PlayerContext()
+        {
+            PlayerMotor = _playerMotor,
+            Variables = _playerVariables,
+            InputBuffer = _inputBuffer
+        };
+
+        SetupJumpVariables(_playerContext);
+        SetupDashVariables(_playerContext);
 
         //Movement
         _movementFactory = new PlayerStateFactory(this);
         _currentMovementState = _movementFactory.Grounded();
-        _currentMovementState.EnterState(ref _playerContext);
+        _currentMovementState.EnterState(_playerContext);
 
         //Camera
         _cameraFactory = new PlayerCameraStateFactory(this);
         _currentCameraState = _cameraFactory.MainCamera();
-        _currentCameraState.EnterState();
-
-
-        SetupJumpVariables();
-        SetupDashVariables();
+        _currentCameraState.EnterState(_playerContext);
     }
     private void Update()
     {
-        UpdateCoyoteTimer();
-        UpdateDashInterval();
-        UpdateDashRegen();
-
         _playerContext.Input = _input.CreateSnapshot();
+
+        _playerContext.DeltaTime = Time.deltaTime;
+        _playerContext.IsGrounded = Controller.isGrounded;
+
+        _playerContext.DashDirection = CalculateDashDirection();
+        _playerContext.AbilityTimers();
 
         _inputBuffer.Register(_playerContext.Input);
         _inputBuffer.Tick(Time.deltaTime);
 
-        _playerContext.InputBuffer = _inputBuffer;
-
-        _currentMovementState.UpdateStates(ref _playerContext);
+        _currentMovementState.UpdateStates(_playerContext);
 
         _playerMotor.UpdatePhysics(_playerContext);
+
         _currentCameraState.UpdateStates(_playerContext);
     }
     #endregion
     #region Helper Functions
     // ─────────────── Jump ─────────────── 
-    private void UpdateCoyoteTimer()
-    {
-        if (_cyoteTimer > 0f)
-            _cyoteTimer -= Time.deltaTime;
-    }
-    private void SetupJumpVariables()
-    {
-        float timeToApex = _playerVariables.maxJumpTime * 0.5f;
 
-        _jumpGravity = -2f * _playerVariables.maxJumpHeight / (timeToApex * timeToApex);
-        _initialJumpVelocity = 2f * _playerVariables.maxJumpHeight / timeToApex;
+    private void SetupJumpVariables(PlayerContext context)
+    {
+        float timeToApex = context.Variables.maxJumpTime * 0.5f;
+
+        context.JumpGravity = -2f * context.Variables.maxJumpHeight / (timeToApex * timeToApex);
+        context.InitialJumpVelocity = 2f * context.Variables.maxJumpHeight / timeToApex;
     }
 
     // ─────────────── Dash ─────────────── 
 
-    private void SetupDashVariables()
+    private void SetupDashVariables(PlayerContext context)
     {
-        _currentDashCharges = _playerVariables.maxDashCharges;
+        context.DashCharges = context.Variables.maxDashCharges;
 
-        float timeToApex = Variables.dashDuration * 0.5f;
+        float timeToApex = context.Variables.dashDuration * 0.5f;
 
-        _dashGravity = -2f * Variables.samllDashJumpHeight / (timeToApex * timeToApex);
-        _initialDashVelocity = 2f * Variables.samllDashJumpHeight / timeToApex;
+        context.DashGravity = -2f * context.Variables.samllDashJumpHeight / (timeToApex * timeToApex);
+        context.InitialDashVelocity = 2f * context.Variables.samllDashJumpHeight / timeToApex;
     }
-    public void DashConsume()
+    public Vector3 CalculateDashDirection()
     {
-        _currentDashCharges--;
-        _dashIntervalTimer = Variables.dashInterval;
-        _dashRegenTimer = Variables.dashRegenTime;
-    }
-    private void UpdateDashInterval()
-    {
-        if (_dashIntervalTimer > 0f)
-            _dashIntervalTimer -= Time.deltaTime;
+        if (_currentCameraState is PlayerAimCamera)
+            return _orientation.forward;
+        return _faceDirection.forward;
     }
 
-    private void UpdateDashRegen()
+    // ---------------- Timers ----------------
+    private void Timers(PlayerContext context)
     {
-        if (_currentDashCharges >= Variables.maxDashCharges)
-            return;
+        if (context.JumpIntervalTimer > 0f)
+            context.JumpIntervalTimer -= context.DeltaTime;
 
-        if (_dashRegenTimer > 0f)
+        if (context.DashIntervalTimer > 0f)
+            context.DashIntervalTimer -= context.DeltaTime;
+
+        if (context.DashRegenTimer > 0f)
         {
-            _dashRegenTimer -= Time.deltaTime;
-            return;
+            context.DashRegenTimer -= context.DeltaTime;
+            if (context.DashRegenTimer <= 0f)
+                DashRules.Regenerate(context);
         }
-
-        _currentDashCharges++;
-        _currentDashCharges = Mathf.Min(
-            _currentDashCharges,
-            Variables.maxDashCharges
-        );
-
-        _dashRegenTimer = Variables.dashRegenTime;
     }
-
     // ─────────────── Cursor ─────────────── 
 
     public void HideMouse()
