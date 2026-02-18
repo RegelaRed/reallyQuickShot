@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3069a050c2e38704da1be5788ea3ff8c, type: 3}
-  m_Name: Bow
+  m_Name: BowData
   m_EditorClassIdentifier: 
   type: 2
   fireRate: 1.2

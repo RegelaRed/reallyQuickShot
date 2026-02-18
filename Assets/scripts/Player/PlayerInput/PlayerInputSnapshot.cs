@@ -7,6 +7,8 @@ public struct PlayerInputSnapshot
     public Vector2 Move;
     public bool MovePressed;
     public Vector2 Look;
+
+    public bool IsGrounded;
     // ------------ Sprint ------------  
     public bool SprintPressed;
     public bool SprintToggle;

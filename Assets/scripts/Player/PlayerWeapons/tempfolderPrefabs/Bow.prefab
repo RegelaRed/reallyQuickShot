@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1344129318722242298}
   - component: {fileID: 8317658172916734558}
+  - component: {fileID: 3641873182906849674}
   m_Layer: 0
   m_Name: Bow
   m_TagString: Untagged
@@ -50,6 +51,18 @@ MonoBehaviour:
   _ammoDataObject:
   - {fileID: 11400000, guid: 7cc72aa01b2e528429ce3b8f183e67df, type: 2}
   - {fileID: 11400000, guid: c6b9dccc4249bbf49b990c5418d11627, type: 2}
+--- !u!114 &3641873182906849674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3316455543121686438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3b0e60c4c1ed724c97a8e2558ba7d7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4589153060203406397
 GameObject:
   m_ObjectHideFlags: 0

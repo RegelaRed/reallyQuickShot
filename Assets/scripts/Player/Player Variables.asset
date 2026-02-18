@@ -14,16 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 8
   sprintSpeed: 12
-  maxJumpHeight: 1.4
-  maxJumpTime: 0.8
-  jumpCutMultiplier: 0.2
-  cyoteTime: 0.4
+  maxJumpHeight: 5
+  maxJumpTime: 1.2
+  jumpCutMultiplier: 0.1
+  jumpBufferTime: 0.4
+  jumpInterval: 0
   maxDashCharges: 2
-  dashInterval: 0.2
-  dashRegenTime: 0.3
+  dashInterval: 0.1
+  dashRegenTime: 0.4
   dashDuration: 0.6
-  dashDistance: 4
-  samllDashJumpHeight: 0.8
+  dashDistance: 6
+  samllDashJumpHeight: 0.6
+  dashBufferTimer: 0.4
   gravity: -10
   airMoveSpeed: 0.2
   maxAirSpeed: 2

@@ -70,11 +70,18 @@ public class PlayerMotor : MonoBehaviour
 
     #endregion
     #region public API
-    public void SetGroundMovementInput(Vector2 input)
+    /// <summary>
+    /// sets the movement Vector for Moving on ground, offers full movement sensitivity
+    /// </summary>
+    /// <param name="input"> Player Context to be pased in </param>
+    public void SetGroundMovementInput(PlayerContext context)
     {
-        _horizontalVelocity = NormalizedInput(input);
+        _horizontalVelocity = NormalizedInput(context.Input.Move);
     }
-
+    /// <summary>
+    /// sets the movement Vector for Moving while in air, reduced movement sensitivity 
+    /// </summary>
+    /// <param name="context"> Player Context to be pased in </param>
     public void SetAirMovementInput(PlayerContext context)
     {
         Vector3 move = NormalizedInput(context.Input.Move);
@@ -86,6 +93,11 @@ public class PlayerMotor : MonoBehaviour
         _horizontalVelocity = Vector3.ClampMagnitude(_horizontalVelocity, context.Variables.maxAirSpeed);
     }
 
+    /// <summary>
+    /// Normalizes and converts Vector2 Input to Vector3 
+    /// </summary>
+    /// <param name="input"> Vector2 of Input axis </param>
+    /// <returns> Vector3 normalized direction</returns>
     private Vector3 NormalizedInput(Vector2 input)
     {
         Vector3 move = _orientation.right * input.x + _orientation.forward * input.y;
@@ -94,6 +106,13 @@ public class PlayerMotor : MonoBehaviour
         return move.normalized;
     }
     //Dash
+    /// <summary>
+    /// Starts the Dash Physics lifecycle
+    /// Defined in PlayerMotor for simpler management of dash lifecycle  
+    /// </summary>
+    /// <param name="distance"> Distance the Dash Covers, used for Calculating Speed </param>
+    /// <param name="duration"> Duration of Dash, Used for Calculating Speed and Dash State Lifetime </param>
+    /// <param name="direction"> Direction of Dash </param>
     public void StartDash(float distance, float duration, Vector3 direction)
     {
         _isDashing = true;
@@ -104,6 +123,10 @@ public class PlayerMotor : MonoBehaviour
         _currentSpeed = distance / duration;
         _horizontalVelocity = direction.normalized;
     }
+    /// <summary>
+    /// Checks to reset dash related Variables and early Dash Exit
+    /// </summary>
+    /// <param name="context"> Player Context for GroundChecks </param>
     private void DashStates(PlayerContext context)
     {
         if (!_isDashing)
@@ -122,28 +145,42 @@ public class PlayerMotor : MonoBehaviour
                 EndDash();
         }
     }
+    /// <summary>
+    /// Reset dash related Varibles
+    /// </summary>
     private void EndDash()
     {
         _isDashing = false;
         _currentSpeed = 0f;
         _dashTimer = 0f;
+        _horizontalVelocity = Vector3.zero;
     }
     //set variables
+    /// <summary>
+    /// Set Player Gravity
+    /// </summary>
+    /// <param name="gravity"> float value for gravity </param>
     public void SetGravity(float gravity)
     {
         if (_currentGravity != gravity)
             _currentGravity = gravity;
     }
+    /// <summary>
+    /// Set Player Speed
+    /// </summary>
+    /// <param name="speed"> float Speed </param>
     public void SetSpeed(float speed)
     {
         if (_currentSpeed != speed)
             _currentSpeed = speed;
     }
+    /// <summary>
+    /// Set Upward force for Jump
+    /// </summary>
+    /// <param name="upWardForce"> float Upward Force</param>
     public void SetUpwardVelocity(float upWardForce)
     {
         _verticalFloat = upWardForce;
     }
-
-
     #endregion
 }

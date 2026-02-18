@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Player Data")]
     [SerializeField] private PlayerVariables _playerVariables;
+    [SerializeField] private LayerMask groundMask;
 
     [Header("Scripts")]
     [SerializeField] private PlayerInputHandler _input;
@@ -97,9 +98,9 @@ public class PlayerController : MonoBehaviour
         _playerContext.Input = _input.CreateSnapshot();
 
         _playerContext.DeltaTime = Time.deltaTime;
-        _playerContext.IsGrounded = Controller.isGrounded;
+        _playerContext.IsGrounded = _characterController.isGrounded;
 
-        _playerContext.DashDirection = CalculateDashDirection();
+        _playerContext.DashDirection = GetDashDirection();
         _playerContext.AbilityTimers();
 
         _inputBuffer.Register(_playerContext.Input);
@@ -114,7 +115,10 @@ public class PlayerController : MonoBehaviour
     #endregion
     #region Helper Functions
     // ─────────────── Jump ─────────────── 
-
+    /// <summary>
+    /// Initialize jump variables 
+    /// </summary>
+    /// <param name="context"> Player Context to be Modified </param>
     private void SetupJumpVariables(PlayerContext context)
     {
         float timeToApex = context.Variables.maxJumpTime * 0.5f;
@@ -125,6 +129,10 @@ public class PlayerController : MonoBehaviour
 
     // ─────────────── Dash ─────────────── 
 
+    /// <summary>
+    /// Initialize Dash variables
+    /// </summary>
+    /// <param name="context"> Player Context to be Modified </param>
     private void SetupDashVariables(PlayerContext context)
     {
         context.DashCharges = context.Variables.maxDashCharges;
@@ -134,28 +142,15 @@ public class PlayerController : MonoBehaviour
         context.DashGravity = -2f * context.Variables.samllDashJumpHeight / (timeToApex * timeToApex);
         context.InitialDashVelocity = 2f * context.Variables.samllDashJumpHeight / timeToApex;
     }
-    public Vector3 CalculateDashDirection()
+    /// <summary>
+    /// Get the Forward Direction of the Player
+    /// </summary>
+    /// <returns> Vector3 Player Forward </returns>
+    public Vector3 GetDashDirection()
     {
         if (_currentCameraState is PlayerAimCamera)
             return _orientation.forward;
         return _faceDirection.forward;
-    }
-
-    // ---------------- Timers ----------------
-    private void Timers(PlayerContext context)
-    {
-        if (context.JumpIntervalTimer > 0f)
-            context.JumpIntervalTimer -= context.DeltaTime;
-
-        if (context.DashIntervalTimer > 0f)
-            context.DashIntervalTimer -= context.DeltaTime;
-
-        if (context.DashRegenTimer > 0f)
-        {
-            context.DashRegenTimer -= context.DeltaTime;
-            if (context.DashRegenTimer <= 0f)
-                DashRules.Regenerate(context);
-        }
     }
     // ─────────────── Cursor ─────────────── 
 
@@ -169,13 +164,6 @@ public class PlayerController : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-    }
-
-    // ─────────────── Utilities ─────────────── 
-
-    public Coroutine RunCorutine(IEnumerator routine)
-    {
-        return StartCoroutine(routine);
     }
     #endregion
 }

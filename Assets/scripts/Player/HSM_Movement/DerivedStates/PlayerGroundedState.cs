@@ -13,7 +13,8 @@ public class PlayerGroundedState : PlayerBaseState
     // ------------ Enter State ------------
     public override void ExitState(PlayerContext context)
     {
-        context.InputBuffer.SetCyoteTime(context.Variables.jumpBufferTime);
+        if (context.IsGrounded)
+            context.InputBuffer.SetCyoteTime(context.Variables.jumpBufferTime);
     }
 
     public override void UpdateState(PlayerContext context)
@@ -49,7 +50,6 @@ public class PlayerGroundedState : PlayerBaseState
         {
             SetSubState(desiredState, context);
         }
-
     }
 
     private PlayerBaseState GetDesiredState(PlayerContext context)

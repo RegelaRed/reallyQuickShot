@@ -28,6 +28,7 @@ public class PlayerInputHandler : MonoBehaviour
     private bool _attackHeld;
     private bool _attackPressed;
     private bool _reloadPressed;
+    private bool _lastAttackPressed;
     // ------------ Weapon switching ------------ 
     private bool _ammoPrevious;
     private bool _ammoNext;
@@ -121,6 +122,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     public PlayerInputSnapshot CreateSnapshot()
     {
+        _lastAttackPressed = _attackHeld;
         return new PlayerInputSnapshot
         {
             Move = _currentMovementInput,
@@ -138,7 +140,7 @@ public class PlayerInputHandler : MonoBehaviour
 
             AttackHeld = _attackHeld,
             AttackPressed = _attackPressed,
-            AttackReleased = !_attackPressed && _attackHeld,
+            AttackReleased = _lastAttackPressed && !_attackHeld,
 
             ReloadPressed = _reloadPressed,
 

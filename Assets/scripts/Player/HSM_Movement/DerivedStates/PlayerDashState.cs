@@ -14,7 +14,11 @@ public class PlayerDashState : PlayerBaseState
         context.PlayerMotor.StartDash(context.Variables.dashDistance, context.Variables.dashDuration, context.DashDirection);
         context.PlayerMotor.SetUpwardVelocity(context.InitialDashVelocity);
     }
-    public override void ExitState(PlayerContext context) { }
+    public override void ExitState(PlayerContext context)
+    {
+        context.InputBuffer.ConsumeJump();
+        context.PlayerMotor.SetGravity(context.Variables.gravity);
+    }
     public override void UpdateState(PlayerContext context) { CheckSwitchState(context); }
     public override void CheckSwitchState(PlayerContext context)
     {
