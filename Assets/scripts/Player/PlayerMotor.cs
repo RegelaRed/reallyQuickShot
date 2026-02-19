@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -151,9 +152,9 @@ public class PlayerMotor : MonoBehaviour
     private void EndDash()
     {
         _isDashing = false;
-        _currentSpeed = 0f;
+        _currentSpeed = _currentSpeed / 4;
         _dashTimer = 0f;
-        _horizontalVelocity = Vector3.zero;
+        // _horizontalVelocity = _horizontalVelocity / 4;
     }
     //set variables
     /// <summary>

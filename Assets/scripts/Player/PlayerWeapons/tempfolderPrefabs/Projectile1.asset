@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc7c20afac06f0d4cb69c42821ef4230, type: 3}
   m_Name: Projectile1
   m_EditorClassIdentifier: 
-  prefab: {fileID: 6835784684787297319, guid: 970d75bee6d946b48b4cb900c61501c9, type: 3}
+  prefab: {fileID: 1588156386484669843, guid: e2ab78cbca685254d955d280f21ffdac, type: 3}
   hitLayers:
     serializedVersion: 2
-    m_Bits: 64
-  damage: 0
+    m_Bits: 72
+  damage: 5
   lifeTime: 10
-  speed: 5
+  speed: 40
   useGravity: 1
-  gravityMultiplier: 0
-  drag: 0
+  gravityMultiplier: 2
+  drag: 0.8
   hitEffectPrefab: {fileID: 0}
   hitAudio: {fileID: 0}
   destroyOnHit: 1

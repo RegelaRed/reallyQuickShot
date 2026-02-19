@@ -10,6 +10,11 @@ public class Projectile : MonoBehaviour
     public ProjectileData Stats => _stats;
     public bool ShouldDestroy => _aliveTime >= _stats.lifeTime || _hasHit;
 
+    /// <summary>
+    /// sets all necessary data on creation
+    /// </summary>
+    /// <param name="stats"> ProjectileData for initializing behaviour</param>
+    /// <param name="velocity"> speed of projectile </param>
     public void Initialize(ProjectileData stats, Vector3 velocity)
     {
         _stats = stats;
@@ -20,29 +25,11 @@ public class Projectile : MonoBehaviour
         _rb.drag = stats.drag;
         _rb.velocity = velocity;
 
-        if (stats.useGravity && stats.gravityMultiplier != 1f)
-        {
-            _rb.useGravity = false; // We'll apply custom gravity
-        }
     }
 
     private void FixedUpdate()
     {
-        if (_hasHit) return;
-
-        _aliveTime += Time.fixedDeltaTime;
-
-        // Custom gravity multiplier
-        if (_stats.useGravity && _stats.gravityMultiplier != 1f)
-        {
-            _rb.AddForce(Physics.gravity * _stats.gravityMultiplier, ForceMode.Acceleration);
-        }
-
-        // Point projectile in direction of travel
-        if (_rb.velocity.magnitude > 0.1f)
-        {
-            transform.forward = _rb.velocity.normalized;
-        }
+        //set the prefab facing direction
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -92,14 +79,17 @@ public class Projectile : MonoBehaviour
         }
         else if (_stats.destroyOnHit)
         {
-            Destroy(gameObject);
+            Destroy(gameObject, 5f);
         }
     }
-
+    /// <summary>
+    /// Projectile Stick to surface
+    /// </summary>
+    /// <param name="collision"></param>
     private void StickToSurface(Collision collision)
     {
-        _rb.isKinematic = true;
         _rb.velocity = Vector3.zero;
+        _rb.isKinematic = true;
 
         // Parent to hit object (moves with it)
         transform.SetParent(collision.transform);

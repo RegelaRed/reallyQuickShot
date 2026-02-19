@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 2
   fireRate: 1.2
-  cahargeRate: 0.2
-  reloadTime: 0.4
+  chargeRate: 0.6
+  reloadTime: 1
   maxCharge: 2
   maxAmmo: 15

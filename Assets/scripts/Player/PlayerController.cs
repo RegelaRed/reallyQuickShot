@@ -114,6 +114,17 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
     #region Helper Functions
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Rigidbody rb = hit.collider.attachedRigidbody;
+
+        if (rb != null && !rb.isKinematic)
+        {
+            Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
+            rb.AddForce(pushDir * _playerVariables.pushForce, ForceMode.Impulse);
+        }
+    }
+
     // ─────────────── Jump ─────────────── 
     /// <summary>
     /// Initialize jump variables 

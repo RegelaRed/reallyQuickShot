@@ -31,6 +31,9 @@ public class PlayerVariables : ScriptableObject
     public float maxAirSpeed = 2f;
     public float airControl = 2f;
 
+    [Header("Physics")]
+    public float pushForce = 1f;
+
     [Header("Camera and Rotation")]
     [Tooltip(" lower value -> slower turn")]
     public float playerBodyRotationSpeed = 5f;

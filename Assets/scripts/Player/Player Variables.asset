@@ -33,8 +33,8 @@ MonoBehaviour:
   playerBodyRotationSpeed: 0.09
   horizontalCameraSensitivity: 50
   verticalCameraSensitivity: 50
-  mainCameraPitchMin: -60
-  mainCameraPitchMax: 20
+  mainCameraPitchMin: -20
+  mainCameraPitchMax: 60
   aimCameraPitchMin: -50
   aimCameraPitchMax: 80
   aimModeSpeed: 4

@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class PlayerWeaponsManager : MonoBehaviour
 {
+    #region References
     // ─────────────── Scene References ─────────────── 
 
     [Header("Scene References")]
@@ -24,8 +25,10 @@ public class PlayerWeaponsManager : MonoBehaviour
 
     // ─────────────── Input ─────────────── 
     public WeaponContext _weaponContext = new WeaponContext();
+    private bool _wasAttackHeld = false;
 
-    // ─────────────── Unity Lifecycle ─────────────── 
+    #endregion
+    #region Updates 
 
     private void Awake()
     {
@@ -49,41 +52,34 @@ public class PlayerWeaponsManager : MonoBehaviour
         if (_playerInput.SwitchWeaponPressed)
             SwitchWeaponIndex();
     }
+    #endregion
+    #region Initialization 
 
-    // ─────────────── Initialization ─────────────── 
-    /// <summary>
-    /// Instanciate all Weapon Instances and Hides them
-    /// </summary>
+    /// <summary>Instanciate all Weapon Instances and Hides them</summary>
     private void InitializeWeapons()
     {
         foreach (var prefab in _weaponPrefabs)
         {
-            GameObject weaponObj = Instantiate(prefab, _weaponPositionIdle);
+            GameObject weaponObj = Instantiate(prefab, _weaponPositionIdle, false);
             WeaponsBase weapon = weaponObj.GetComponent<WeaponsBase>();
-            weaponObj.transform.position = Vector3.zero;
 
             if (weapon == null)
             {
                 Destroy(weaponObj);
                 continue;
             }
-            Debug.Log($"Instanciated weapon name: {weaponObj.name}");
             _weaponList.Add(weapon);
-            weaponObj.transform.localPosition = Vector3.zero;
-            weapon.OnInitialize(this);
+            weapon.OnInitialize(_weaponContext);
             weapon.UnEquip(_weaponContext);
         }
     }
 
-    // ─────────────── Input ─────────────── 
+    #endregion
+    #region Input 
 
-    /// <summary>
-    /// Snapshot of Input for Weapons to read
-    /// </summary>
+    /// <summary>Snapshot of Input for Weapons to read</summary>
     private void CaptureInput()
     {
-        bool _wasAttackHeld = _playerInput.AttackHeld;
-
         _weaponContext.DeltaTime = Time.deltaTime;
 
         _weaponContext.AttackDirection = _orientation.forward;
@@ -98,20 +94,21 @@ public class PlayerWeaponsManager : MonoBehaviour
         _weaponContext.AmmoPrevious = _playerInput.AmmoPrevious;
 
         _weaponContext.AimMode = _playerInput.IsAiming;
+
+        _wasAttackHeld = _playerInput.AttackHeld;
     }
 
-    // ─────────────── Weapon Switching ─────────────── 
-    /// <summary>
-    /// Switch Weapon Index, Increments index on each call
-    /// </summary>
+    #endregion
+    #region Weapon Switching
+
+    /// <summary>Switch Weapon Index, Increments index on each call</summary>
     private void SwitchWeaponIndex()
     {
         int nextIndex = (_currentWeaponIndex + 1) % _weaponList.Count;
         EquipWeapon(nextIndex);
     }
-    /// <summary>
-    /// Equip weapon prefab by Index
-    /// </summary>
+
+    /// <summary>Equip weapon prefab by Index</summary>
     /// <param name="index"> int Index of weapon to be Selected </param>
     private void EquipWeapon(int index)
     {
@@ -127,4 +124,5 @@ public class PlayerWeaponsManager : MonoBehaviour
         _currentWeapon = _weaponList[index];
         _currentWeapon.Equip(_weaponContext);
     }
+    #endregion
 }
