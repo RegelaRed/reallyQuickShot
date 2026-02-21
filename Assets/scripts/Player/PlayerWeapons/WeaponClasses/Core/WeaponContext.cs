@@ -15,9 +15,11 @@ public class WeaponContext
     public bool AttackHeld;
     public bool AttackReleased;
     public bool ReloadPressed;
+    // -------- Weapon Switching --------
+    public bool WeaponPrevious;
+    public bool WeaponNext;
     // -------- Ammo Switching --------
-    public bool AmmoNext;
-    public bool AmmoPrevious;
+    public bool AmmoSwitch;
     // -------- Aim Toggle --------
     public bool AimMode;
 }

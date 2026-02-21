@@ -1471,7 +1471,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec884dc2032b6e1468c3bd1e552de4c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _wtx: {fileID: 0}
 --- !u!4 &1865580808
 Transform:
   m_ObjectHideFlags: 0
@@ -1639,6 +1638,10 @@ PrefabInstance:
       propertyPath: _mainCamera
       value: 
       objectReference: {fileID: 407006907}
+    - target: {fileID: 4294288481580402032, guid: 67aa950a8ebfbbe47a249939d0ff399d, type: 3}
+      propertyPath: groundMask.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7399937482502387181, guid: 67aa950a8ebfbbe47a249939d0ff399d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.5
@@ -1649,6 +1652,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8559840917731831578, guid: 67aa950a8ebfbbe47a249939d0ff399d, type: 3}
       propertyPath: _controlelr
+      value: 
+      objectReference: {fileID: 1867308110}
+    - target: {fileID: 8559840917731831578, guid: 67aa950a8ebfbbe47a249939d0ff399d, type: 3}
+      propertyPath: _controller
       value: 
       objectReference: {fileID: 1867308110}
     - target: {fileID: 8559840917731831578, guid: 67aa950a8ebfbbe47a249939d0ff399d, type: 3}

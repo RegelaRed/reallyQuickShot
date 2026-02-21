@@ -7,7 +7,7 @@ public class PlayerMotor : MonoBehaviour
 {
     #region References
     // Cached references
-    [SerializeField] private CharacterController _controlelr;
+    [SerializeField] private CharacterController _controller;
     [SerializeField] private PlayerVariables _playerVariables;
     [SerializeField] private Transform _orientation;
     [SerializeField] private Transform _faceDirection;
@@ -49,7 +49,7 @@ public class PlayerMotor : MonoBehaviour
     {
         ApplyGravity(context);
         DashStates(context);
-        _controlelr.Move(CalculateFinalMoveVector() * Time.deltaTime);
+        _controller.Move(CalculateFinalMoveVector() * Time.deltaTime);
     }
 
     #endregion

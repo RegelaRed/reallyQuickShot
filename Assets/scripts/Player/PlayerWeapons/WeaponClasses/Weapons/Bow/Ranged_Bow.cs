@@ -3,6 +3,21 @@ using Unity.VisualScripting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
+/// <summary>
+/// Bow weapon with charge-up mechanic and multiple ammo types.
+/// Implements a hold-to-charge, release-to-fire pattern with reload management.
+/// </summary>
+/// <remarks>
+/// Core Mechanics:
+/// - Hold attack to charge arrow (up to max charge rate)
+/// - Release to fire with power based on charge percentage
+/// - Reload blocks all actions until timer completes
+/// - Supports multiple ammo types with independent ammo counts
+/// 
+/// State Flow:
+/// Idle → Charging (attack held) → Fire (attack released) → Idle
+/// Any State → Reloading (reload pressed) → Idle (timer complete)
+/// </remarks>
 public class Ranged_Bow : WeaponsBase
 {
     #region References/Variables
@@ -30,8 +45,6 @@ public class Ranged_Bow : WeaponsBase
     #endregion
     #region  Tick Updates
 
-    /// <summary>Update Weapon Behaviour</summary>
-    /// <param name="weaponContext"></param>
     public override void UpdateWeapon(WeaponContext weaponContext)
     {
         // Handle reload 
@@ -67,13 +80,17 @@ public class Ranged_Bow : WeaponsBase
         if (weaponContext.ReloadPressed && CanReload)
             StartReload();
 
-        if (weaponContext.AmmoNext) SwitchAmmo(1);
-        if (weaponContext.AmmoPrevious) SwitchAmmo(-1);
+        if (weaponContext.AmmoSwitch) SwitchAmmo(1);
+
     }
     #endregion
     #region Weapon Behaviour
 
-    /// <summary>Set ReloadTimer and reset accumulates charge to 0</summary>
+
+    /// <summary>
+    /// Starts Reload state
+    /// Sets reload timer to reload time from weaponData and resets current charge
+    /// </summary>
     private void StartReload()
     {
         Debug.Log("StartReload");
@@ -81,8 +98,6 @@ public class Ranged_Bow : WeaponsBase
         _currentCharge = 0f;
     }
 
-    /// <summary>tick down reload timer</summary>
-    /// <param name="DeltaTime">weaponContest for DeltaTime</param>
     public override void Timers(WeaponContext weaponContext)
     {
         _reloadTimer -= weaponContext.DeltaTime;

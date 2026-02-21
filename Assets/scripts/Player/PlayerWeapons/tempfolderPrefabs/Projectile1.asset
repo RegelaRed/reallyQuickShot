@@ -15,13 +15,13 @@ MonoBehaviour:
   prefab: {fileID: 1588156386484669843, guid: e2ab78cbca685254d955d280f21ffdac, type: 3}
   hitLayers:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 4294967295
   damage: 5
   lifeTime: 10
   speed: 40
   useGravity: 1
   gravityMultiplier: 2
-  drag: 0.8
+  drag: 0
   hitEffectPrefab: {fileID: 0}
   hitAudio: {fileID: 0}
   destroyOnHit: 1

@@ -30,9 +30,9 @@ public class PlayerInputHandler : MonoBehaviour
     private bool _reloadPressed;
     private bool _lastAttackPressed;
     // ------------ Weapon switching ------------ 
-    private bool _ammoPrevious;
-    private bool _ammoNext;
-    private bool _switchWeaponPressed;
+    private bool _weaponPrevious;
+    private bool _weaponNext;
+    private bool _switchAmmoPressed;
 
     #endregion
     #region Getters/Setters
@@ -62,9 +62,9 @@ public class PlayerInputHandler : MonoBehaviour
     public bool IsAiming { get { return _attackHeld || _aimToggle; } }
 
     // ------------ Weapon switching ------------ 
-    public bool AmmoPrevious { get { return _ammoPrevious; } }
-    public bool AmmoNext { get { return _ammoNext; } }
-    public bool SwitchWeaponPressed { get { return _switchWeaponPressed; } }
+    public bool WeaponPrevious { get { return _weaponPrevious; } }
+    public bool WeaponNext { get { return _weaponNext; } }
+    public bool SwitchAmmoPressed { get { return _switchAmmoPressed; } }
 
     #endregion
     //------------------------------------------------
@@ -96,11 +96,11 @@ public class PlayerInputHandler : MonoBehaviour
         _action.Player.AimMode.performed += context => OnAimEnabled(context);
         _action.Player.AimMode.canceled += context => OnAimEnabled(context);
 
-        _action.Player.Weapon1.performed += context => OnWeapon1(context);
-        _action.Player.Weapon1.canceled += context => OnWeapon1(context);
+        _action.Player.WeaponPrevious.performed += context => OnWeaponPrevious(context);
+        _action.Player.WeaponPrevious.canceled += context => OnWeaponPrevious(context);
 
-        _action.Player.Weapon2.performed += context => OnWeapon2(context);
-        _action.Player.Weapon2.canceled += context => OnWeapon2(context);
+        _action.Player.WeaponNext.performed += context => OnWeaponNext(context);
+        _action.Player.WeaponNext.canceled += context => OnWeaponNext(context);
 
         _action.Player.SwitchAmmo.performed += context => OnSwitchAmmo(context);
         _action.Player.SwitchAmmo.canceled += context => OnSwitchAmmo(context);
@@ -110,9 +110,9 @@ public class PlayerInputHandler : MonoBehaviour
         _isJumpPressedThisFrame = false;
         _isDashPressedThisFrame = false;
         _attackPressed = false;
-        _ammoNext = false;
-        _ammoPrevious = false;
-        _switchWeaponPressed = false;
+        _weaponNext = false;
+        _weaponPrevious = false;
+        _switchAmmoPressed = false;
         //delays
         float T = Time.deltaTime;
         if (_jumpBufferTimer > 0f) _jumpBufferTimer -= T;
@@ -144,9 +144,9 @@ public class PlayerInputHandler : MonoBehaviour
 
             ReloadPressed = _reloadPressed,
 
-            AmmoPrevious = _ammoPrevious,
-            AmmoNext = _ammoNext,
-            SwitchWeapon = _switchWeaponPressed,
+            AmmoPrevious = _weaponPrevious,
+            AmmoNext = _weaponNext,
+            SwitchWeapon = _switchAmmoPressed,
             AimMode = _aimToggle
         };
     }
@@ -214,17 +214,17 @@ public class PlayerInputHandler : MonoBehaviour
     private void OnSwitchAmmo(InputAction.CallbackContext context)
     {
         if (context.performed)
-            _switchWeaponPressed = true;
+            _switchAmmoPressed = true;
     }
-    private void OnWeapon1(InputAction.CallbackContext context)
+    private void OnWeaponPrevious(InputAction.CallbackContext context)
     {
         if (context.performed)
-            _ammoPrevious = true;
+            _weaponPrevious = true;
     }
-    private void OnWeapon2(InputAction.CallbackContext context)
+    private void OnWeaponNext(InputAction.CallbackContext context)
     {
         if (context.performed)
-            _ammoNext = true;
+            _weaponNext = true;
     }
     #endregion
     //-------- New Player Input System requirements ------------

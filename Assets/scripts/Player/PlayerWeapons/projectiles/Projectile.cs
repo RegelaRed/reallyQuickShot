@@ -79,11 +79,16 @@ public class Projectile : MonoBehaviour
         }
         else if (_stats.destroyOnHit)
         {
-            Destroy(gameObject, 5f);
+            Destroy(gameObject, 2f);
         }
+
+        Collider[] allCollider = GetComponentsInChildren<Collider>();
+        foreach (var collider in allCollider)
+            collider.enabled = false;
     }
     /// <summary>
-    /// Projectile Stick to surface
+    /// Sticks the projectile to hit surface
+    /// Sets velocity to 0 and sets Rigid Body to kinematic
     /// </summary>
     /// <param name="collision"></param>
     private void StickToSurface(Collision collision)
@@ -92,7 +97,7 @@ public class Projectile : MonoBehaviour
         _rb.isKinematic = true;
 
         // Parent to hit object (moves with it)
-        transform.SetParent(collision.transform);
+        // transform.SetParent(collision.transform, true);
 
         // Destroy after delay
         Destroy(gameObject, 3f);

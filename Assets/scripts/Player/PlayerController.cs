@@ -1,12 +1,18 @@
-using System.Collections;
 using UnityEngine;
-
+/// <summary>
+/// Player Controller Manages Player Behaviour
+/// Inputs, Scene References, Player Movement State Machine, Player Camera State Machine
+/// 
+/// </summary>
+/// <remarks>
+/// 
+/// </remarks>
 public class PlayerController : MonoBehaviour
 {
-    #region erences
-    // ─────────────── erences ─────────────── 
+    #region References
+    // ─────────────── References ─────────────── 
 
-    [Header("Scene erences")]
+    [Header("Scene References")]
     [SerializeField] private CharacterController _characterController;
     [SerializeField] private Transform _orientation;
     [SerializeField] private Transform _playerCameraPosition;

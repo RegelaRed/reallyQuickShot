@@ -147,7 +147,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Weapon1"",
+                    ""name"": ""WeaponPrevious"",
                     ""type"": ""Button"",
                     ""id"": ""2776c80d-3c14-4091-8c56-d04ced07a2b0"",
                     ""expectedControlType"": """",
@@ -156,7 +156,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Weapon2"",
+                    ""name"": ""WeaponNext"",
                     ""type"": ""Button"",
                     ""id"": ""b7230bb6-fc9b-4f52-8b25-f5e19cb2c2ba"",
                     ""expectedControlType"": """",
@@ -449,7 +449,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Weapon2"",
+                    ""action"": ""WeaponNext"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -460,7 +460,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Weapon2"",
+                    ""action"": ""WeaponNext"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -471,7 +471,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Weapon2"",
+                    ""action"": ""WeaponNext"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -548,7 +548,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
-                    ""action"": ""Weapon1"",
+                    ""action"": ""WeaponPrevious"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -559,7 +559,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
-                    ""action"": ""Weapon1"",
+                    ""action"": ""WeaponPrevious"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -570,7 +570,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Weapon1"",
+                    ""action"": ""WeaponPrevious"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -654,7 +654,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""574198f8-612f-419c-b4ee-12387cbc03ba"",
-                    ""path"": ""<Keyboard>/t"",
+                    ""path"": ""<Keyboard>/g"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
@@ -1252,8 +1252,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
-        m_Player_Weapon1 = m_Player.FindAction("Weapon1", throwIfNotFound: true);
-        m_Player_Weapon2 = m_Player.FindAction("Weapon2", throwIfNotFound: true);
+        m_Player_WeaponPrevious = m_Player.FindAction("WeaponPrevious", throwIfNotFound: true);
+        m_Player_WeaponNext = m_Player.FindAction("WeaponNext", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
         m_Player_AimMode = m_Player.FindAction("AimMode", throwIfNotFound: true);
@@ -1358,8 +1358,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Interact;
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Jump;
-    private readonly InputAction m_Player_Weapon1;
-    private readonly InputAction m_Player_Weapon2;
+    private readonly InputAction m_Player_WeaponPrevious;
+    private readonly InputAction m_Player_WeaponNext;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Dash;
     private readonly InputAction m_Player_AimMode;
@@ -1401,13 +1401,13 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Weapon1".
+        /// Provides access to the underlying input action "Player/WeaponPrevious".
         /// </summary>
-        public InputAction @Weapon1 => m_Wrapper.m_Player_Weapon1;
+        public InputAction @WeaponPrevious => m_Wrapper.m_Player_WeaponPrevious;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Weapon2".
+        /// Provides access to the underlying input action "Player/WeaponNext".
         /// </summary>
-        public InputAction @Weapon2 => m_Wrapper.m_Player_Weapon2;
+        public InputAction @WeaponNext => m_Wrapper.m_Player_WeaponNext;
         /// <summary>
         /// Provides access to the underlying input action "Player/Sprint".
         /// </summary>
@@ -1472,12 +1472,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @Weapon1.started += instance.OnWeapon1;
-            @Weapon1.performed += instance.OnWeapon1;
-            @Weapon1.canceled += instance.OnWeapon1;
-            @Weapon2.started += instance.OnWeapon2;
-            @Weapon2.performed += instance.OnWeapon2;
-            @Weapon2.canceled += instance.OnWeapon2;
+            @WeaponPrevious.started += instance.OnWeaponPrevious;
+            @WeaponPrevious.performed += instance.OnWeaponPrevious;
+            @WeaponPrevious.canceled += instance.OnWeaponPrevious;
+            @WeaponNext.started += instance.OnWeaponNext;
+            @WeaponNext.performed += instance.OnWeaponNext;
+            @WeaponNext.canceled += instance.OnWeaponNext;
             @Sprint.started += instance.OnSprint;
             @Sprint.performed += instance.OnSprint;
             @Sprint.canceled += instance.OnSprint;
@@ -1522,12 +1522,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @Weapon1.started -= instance.OnWeapon1;
-            @Weapon1.performed -= instance.OnWeapon1;
-            @Weapon1.canceled -= instance.OnWeapon1;
-            @Weapon2.started -= instance.OnWeapon2;
-            @Weapon2.performed -= instance.OnWeapon2;
-            @Weapon2.canceled -= instance.OnWeapon2;
+            @WeaponPrevious.started -= instance.OnWeaponPrevious;
+            @WeaponPrevious.performed -= instance.OnWeaponPrevious;
+            @WeaponPrevious.canceled -= instance.OnWeaponPrevious;
+            @WeaponNext.started -= instance.OnWeaponNext;
+            @WeaponNext.performed -= instance.OnWeaponNext;
+            @WeaponNext.canceled -= instance.OnWeaponNext;
             @Sprint.started -= instance.OnSprint;
             @Sprint.performed -= instance.OnSprint;
             @Sprint.canceled -= instance.OnSprint;
@@ -1886,19 +1886,19 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnJump(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Weapon1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "WeaponPrevious" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnWeapon1(InputAction.CallbackContext context);
+        void OnWeaponPrevious(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Weapon2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "WeaponNext" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnWeapon2(InputAction.CallbackContext context);
+        void OnWeaponNext(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

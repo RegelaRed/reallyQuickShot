@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerWeaponsManager : MonoBehaviour
@@ -49,8 +50,10 @@ public class PlayerWeaponsManager : MonoBehaviour
 
         _currentWeapon?.UpdateWeapon(_weaponContext);
 
-        if (_playerInput.SwitchWeaponPressed)
+        if (_playerInput.WeaponNext)
             SwitchWeaponIndex();
+        else if (_playerInput.WeaponPrevious)
+            SwitchWeaponIndex(-1);
     }
     #endregion
     #region Initialization 
@@ -90,8 +93,10 @@ public class PlayerWeaponsManager : MonoBehaviour
 
         _weaponContext.ReloadPressed = _playerInput.ReloadPressed;
 
-        _weaponContext.AmmoNext = _playerInput.AmmoNext;
-        _weaponContext.AmmoPrevious = _playerInput.AmmoPrevious;
+        _weaponContext.WeaponPrevious = _playerInput.WeaponPrevious;
+        _weaponContext.WeaponNext = _playerInput.WeaponNext;
+
+        _weaponContext.AmmoSwitch = _playerInput.SwitchAmmoPressed;
 
         _weaponContext.AimMode = _playerInput.IsAiming;
 
@@ -102,9 +107,9 @@ public class PlayerWeaponsManager : MonoBehaviour
     #region Weapon Switching
 
     /// <summary>Switch Weapon Index, Increments index on each call</summary>
-    private void SwitchWeaponIndex()
+    private void SwitchWeaponIndex(int index = 1)
     {
-        int nextIndex = (_currentWeaponIndex + 1) % _weaponList.Count;
+        int nextIndex = (_currentWeaponIndex + index + _weaponList.Count) % _weaponList.Count;
         EquipWeapon(nextIndex);
     }
 
