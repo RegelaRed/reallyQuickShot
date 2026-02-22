@@ -119,7 +119,6 @@ public class PlayerMotor : MonoBehaviour
         _isDashing = true;
         _dashLeftGround = false;
 
-        _horizontalVelocity = Vector3.zero;
         _dashTimer = duration;
         _currentSpeed = distance / duration;
         _horizontalVelocity = direction.normalized;
@@ -152,9 +151,8 @@ public class PlayerMotor : MonoBehaviour
     private void EndDash()
     {
         _isDashing = false;
-        _currentSpeed = _currentSpeed / 4;
         _dashTimer = 0f;
-        // _horizontalVelocity = _horizontalVelocity / 4;
+        _verticalFloat = 0f;
     }
     //set variables
     /// <summary>

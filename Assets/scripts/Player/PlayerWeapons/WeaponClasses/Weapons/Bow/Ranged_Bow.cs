@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>
@@ -8,13 +7,13 @@ using UnityEngine;
 /// Implements a hold-to-charge, release-to-fire pattern with reload management.
 /// </summary>
 /// <remarks>
-/// Core Mechanics:
-/// - Hold attack to charge arrow (up to max charge rate)
-/// - Release to fire with power based on charge percentage
-/// - Reload blocks all actions until timer completes
-/// - Supports multiple ammo types with independent ammo counts
+/// Core Mechanics:<para/>
+/// - Hold attack to charge arrow (up to max charge rate)<para/>
+/// - Release to fire with power based on charge percentage<para/>
+/// - Reload blocks all actions until timer completes<para/>
+/// - Supports multiple ammo types with independent ammo counts<para/>
 /// 
-/// State Flow:
+/// State Flow:<para/>
 /// Idle → Charging (attack held) → Fire (attack released) → Idle
 /// Any State → Reloading (reload pressed) → Idle (timer complete)
 /// </remarks>
@@ -117,8 +116,8 @@ public class Ranged_Bow : WeaponsBase
 
         float charge = _currentCharge / _weaponData.maxCharge;
 
-        Debug.Log($"Current Ammo count {CurrentAmmoCount}");
-        Debug.Log($"Current Charge {_currentCharge}");
+        // Debug.Log($"Current Ammo count {CurrentAmmoCount}");
+        // Debug.Log($"Current Charge {_currentCharge}");
         _spawner.CreateProjectile(_currentAmmoData, charge, ProjectileLaunchPoint);
         _currentCharge = 0f;
     }

@@ -101,6 +101,8 @@ public class PlayerController : MonoBehaviour
     }
     private void Update()
     {
+        Debug.Log($"current active state {_currentMovementState.CurrentSubState ?? _currentMovementState}");
+
         _playerContext.Input = _input.CreateSnapshot();
 
         _playerContext.DeltaTime = Time.deltaTime;
@@ -139,13 +141,12 @@ public class PlayerController : MonoBehaviour
     private void SetupJumpVariables(PlayerContext context)
     {
         float timeToApex = context.Variables.maxJumpTime * 0.5f;
-
+        context.TimeToApex = timeToApex;
         context.JumpGravity = -2f * context.Variables.maxJumpHeight / (timeToApex * timeToApex);
         context.InitialJumpVelocity = 2f * context.Variables.maxJumpHeight / timeToApex;
     }
 
     // ─────────────── Dash ─────────────── 
-
     /// <summary>
     /// Initialize Dash variables
     /// </summary>
@@ -159,6 +160,7 @@ public class PlayerController : MonoBehaviour
         context.DashGravity = -2f * context.Variables.samllDashJumpHeight / (timeToApex * timeToApex);
         context.InitialDashVelocity = 2f * context.Variables.samllDashJumpHeight / timeToApex;
     }
+
     /// <summary>
     /// Get the Forward Direction of the Player
     /// </summary>
@@ -169,8 +171,8 @@ public class PlayerController : MonoBehaviour
             return _orientation.forward;
         return _faceDirection.forward;
     }
-    // ─────────────── Cursor ─────────────── 
 
+    // ─────────────── Cursor ─────────────── 
     public void HideMouse()
     {
         Cursor.lockState = CursorLockMode.Locked;

@@ -6,15 +6,14 @@ public class Projectile : MonoBehaviour
     private Rigidbody _rb;
     private float _aliveTime;
     private bool _hasHit;
+    private Vector3 _dir;
 
     public ProjectileData Stats => _stats;
     public bool ShouldDestroy => _aliveTime >= _stats.lifeTime || _hasHit;
 
-    /// <summary>
-    /// sets all necessary data on creation
-    /// </summary>
-    /// <param name="stats"> ProjectileData for initializing behaviour</param>
-    /// <param name="velocity"> speed of projectile </param>
+    /// <summary>sets all necessary data on creation</summary>
+    /// <param name="stats">ProjectileData for initializing behaviour</param>
+    /// <param name="velocity">speed of projectile</param>
     public void Initialize(ProjectileData stats, Vector3 velocity)
     {
         _stats = stats;
@@ -24,12 +23,14 @@ public class Projectile : MonoBehaviour
         _rb.useGravity = stats.useGravity;
         _rb.drag = stats.drag;
         _rb.velocity = velocity;
-
     }
 
     private void FixedUpdate()
     {
+        Vector3 rbVelocity = _rb.velocity;
         //set the prefab facing direction
+        if (rbVelocity.magnitude > Mathf.Epsilon)
+            transform.rotation = Quaternion.LookRotation(rbVelocity);
     }
 
     private void OnCollisionEnter(Collision collision)

@@ -16,7 +16,7 @@ public class PlayerContext
     public float InitialJumpVelocity;
     public float JumpGravity;
     public float JumpIntervalTimer;
-
+    public float TimeToApex;
     // -------- Dash --------
     public int DashCharges;
     public float InitialDashVelocity;
@@ -28,6 +28,8 @@ public class PlayerContext
 
     // -------- Tiemrs --------
     public float DeltaTime;
+
+
     public void AbilityTimers()
     {
         if (JumpIntervalTimer > 0f)

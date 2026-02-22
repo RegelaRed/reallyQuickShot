@@ -8,6 +8,7 @@ public class PlayerGroundedState : PlayerBaseState
     public override void EnterState(PlayerContext context)
     {
         context.PlayerMotor.SetGravity(context.Variables.gravity);
+        context.PlayerMotor.SetSpeed(context.Variables.walkSpeed);
         InitializeSubState(context);
     }
     // ------------ Enter State ------------

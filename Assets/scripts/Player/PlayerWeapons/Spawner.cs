@@ -4,7 +4,7 @@ public class Spawner : MonoBehaviour
 {
     public void CreateProjectile(ProjectileData projectileData, float normalizedCharge, Transform startPosition)
     {
-        Debug.Log($"Spawner Called {projectileData.prefab.name}");
+        // Debug.Log($"Spawner Called {projectileData.prefab.name}");
 
         // Calculate velocity based on charge
         float minSpeed = projectileData.speed / 3;

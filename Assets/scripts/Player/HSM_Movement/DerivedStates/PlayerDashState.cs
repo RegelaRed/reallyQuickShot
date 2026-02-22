@@ -1,6 +1,3 @@
-using System.Collections;
-using UnityEngine;
-
 public class PlayerDashState : PlayerBaseState
 {
     public PlayerDashState(PlayerController _ctx, PlayerStateFactory _factory) : base(_ctx, _factory)
@@ -16,8 +13,10 @@ public class PlayerDashState : PlayerBaseState
     }
     public override void ExitState(PlayerContext context)
     {
-        context.InputBuffer.ConsumeJump();
-        context.PlayerMotor.SetGravity(context.Variables.gravity);
+        // context.InputBuffer.ConsumeJump();
+        context.PlayerMotor.SetGravity(context.JumpGravity);
+        if (!context.IsGrounded)
+            context.PlayerMotor.SetSpeed(context.Variables.airMoveSpeed);
     }
     public override void UpdateState(PlayerContext context) { CheckSwitchState(context); }
     public override void CheckSwitchState(PlayerContext context)

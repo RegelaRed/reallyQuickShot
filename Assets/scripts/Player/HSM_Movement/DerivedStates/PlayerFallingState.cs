@@ -4,7 +4,7 @@ public class PlayerFallingState : PlayerBaseState
      : base(_ctx, _factory) { }
     public override void EnterState(PlayerContext context)
     {
-        context.PlayerMotor.SetGravity(context.Variables.gravity);
+        context.PlayerMotor.SetGravity(context.JumpGravity);
     }
 
     public override void ExitState(PlayerContext context) { }

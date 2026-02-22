@@ -18,7 +18,7 @@ MonoBehaviour:
   maxJumpTime: 1.2
   jumpCutMultiplier: 0.1
   jumpBufferTime: 0.4
-  jumpInterval: 0
+  jumpInterval: 0.1
   maxDashCharges: 2
   dashInterval: 0.1
   dashRegenTime: 0.4
@@ -30,6 +30,7 @@ MonoBehaviour:
   airMoveSpeed: 0.2
   maxAirSpeed: 2
   airControl: 18
+  pushForce: 1
   playerBodyRotationSpeed: 0.09
   horizontalCameraSensitivity: 50
   verticalCameraSensitivity: 50

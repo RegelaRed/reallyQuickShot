@@ -1,32 +1,27 @@
-
+/// <summary>
+/// Responsible for creating and configuring player state instances.<para/>
+/// Provides factory methods for both root and sub states.
+/// </summary>
 public class PlayerStateFactory
 {
-    PlayerController _ctx;
+    private PlayerController _ctx;
     public PlayerStateFactory(PlayerController _currentContext) { _ctx = _currentContext; }
-    //Root States
+    //Super States
     public PlayerBaseState Grounded()
     {
-        var state = new PlayerGroundedState(_ctx, this);
-        state.IsRootState = true;
-        return state;
+        return new PlayerGroundedState(_ctx, this) { IsSuperState = true };
     }
     public PlayerBaseState Falling()
     {
-        var state = new PlayerFallingState(_ctx, this);
-        state.IsRootState = true;
-        return state;
+        return new PlayerFallingState(_ctx, this) { IsSuperState = true };
     }
     public PlayerBaseState Jump()
     {
-        var state = new PlayerJumpState(_ctx, this);
-        state.IsRootState = true;
-        return state;
+        return new PlayerJumpState(_ctx, this) { IsSuperState = true };
     }
     public PlayerBaseState Dash()
     {
-        var state = new PlayerDashState(_ctx, this);
-        state.IsRootState = true;
-        return state;
+        return new PlayerDashState(_ctx, this) { IsSuperState = true };
     }
 
     //Sub States
