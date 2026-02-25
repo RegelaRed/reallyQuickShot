@@ -6,11 +6,11 @@ using UnityEngine;
 /// </summary>
 public static class DashRules
 {
-    public static bool CanDash(PlayerContext context) => context.DashCharges > 0 && context.DashIntervalTimer <= 0f;
+    public static bool CanDash(PlayerContext context) => context.DashCharges > 0 && context.CanDashIntervalTimer <= 0f;
     public static void Consume(PlayerContext context)
     {
         context.DashCharges--;
-        context.DashIntervalTimer = context.Variables.dashInterval;
+        context.CanDashIntervalTimer = context.Variables.dashInterval;
         context.DashRegenTimer = context.Variables.dashRegenTime;
     }
     public static void Regenerate(PlayerContext context)

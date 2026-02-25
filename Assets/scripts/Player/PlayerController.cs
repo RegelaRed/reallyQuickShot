@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 /// <summary>
 /// Player Controller Manages Player Behaviour
@@ -32,9 +33,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerMotor _playerMotor;
 
     private PlayerContext _playerContext;
+    // private variables
+    private bool _lastAttackPressed = false;
 
     // ─────────────── State Machines ─────────────── 
-
     private PlayerBaseState _currentMovementState;
     private PlayerStateFactory _movementFactory;
 
@@ -66,7 +68,6 @@ public class PlayerController : MonoBehaviour
         set => _currentCameraState = value;
     }
     #endregion
-
     #region Update Methods
     // ─────────────── Unity Lifecycle ─────────────── 
 
@@ -74,36 +75,49 @@ public class PlayerController : MonoBehaviour
     {
         HideMouse();
 
-        _input ??= GetComponent<PlayerInputHandler>();
+        _input ??= GetComponent<PlayerInputHandler>() ?? this.AddComponent<PlayerInputHandler>();
         _playerMotor ??= GetComponent<PlayerMotor>();
+        if (_playerMotor == null)
+            Debug.Log("No Playermotor component");
 
         //Context
         _inputBuffer = new PlayerInputBuffer(_playerVariables.jumpBufferTime, _playerVariables.dashBufferTimer);
         _playerContext = new PlayerContext()
         {
-            PlayerMotor = _playerMotor,
             Variables = _playerVariables,
             InputBuffer = _inputBuffer
         };
 
-        SetupJumpVariables(_playerContext);
-        SetupDashVariables(_playerContext);
+        //Variables Initialization
+        SetupVariables(_playerContext);
 
         //Movement
-        _movementFactory = new PlayerStateFactory(this);
+        _movementFactory = new PlayerStateFactory(_playerMotor);
         _currentMovementState = _movementFactory.Grounded();
         _currentMovementState.EnterState(_playerContext);
 
         //Camera
-        _cameraFactory = new PlayerCameraStateFactory(this);
+        _cameraFactory = new PlayerCameraStateFactory(this, _playerMotor);
         _currentCameraState = _cameraFactory.MainCamera();
         _currentCameraState.EnterState(_playerContext);
     }
+    PlayerBaseState lastState;
+    PlayerBaseState activeState;
     private void Update()
     {
-        Debug.Log($"current active state {_currentMovementState.CurrentSubState ?? _currentMovementState}");
+        activeState = _currentMovementState.CurrentSubState ?? _currentMovementState;
+        if (lastState != activeState)
+        {
+            Debug.Log("------------------------------------"
+                + System.Environment.NewLine
+                + $"current active state {activeState}");
 
-        _playerContext.Input = _input.CreateSnapshot();
+            Debug.Log($"current movement speed {_playerMotor.CurrentSpeed}");
+            Debug.Log($"current movement gravity {_playerMotor.Gravity}");
+            lastState = activeState;
+        }
+
+        _playerContext.Input = CreateSnapshot();
 
         _playerContext.DeltaTime = Time.deltaTime;
         _playerContext.IsGrounded = _characterController.isGrounded;
@@ -114,14 +128,68 @@ public class PlayerController : MonoBehaviour
         _inputBuffer.Register(_playerContext.Input);
         _inputBuffer.Tick(Time.deltaTime);
 
+        //Movement State machine
         _currentMovementState.UpdateStates(_playerContext);
+        var nextMove = _currentMovementState.CheckSwitchState(_playerContext);
+        if (nextMove != CurrentMovementState)
+            _currentMovementState.SwitchStates(nextMove, _playerContext, this);
+
 
         _playerMotor.UpdatePhysics(_playerContext);
 
+        //Camera State machine
         _currentCameraState.UpdateStates(_playerContext);
+        var nextCam = _currentCameraState.CheckSwitchState(_playerContext);
+        if (nextCam != _currentCameraState)
+            _currentCameraState.SwitchStates(nextCam, _playerContext);
+    }
+
+    private void SwitchCameraState(PlayerCameraBaseState newState)
+    {
+        _currentCameraState.ExitState(_playerContext);
+
+        _currentCameraState = newState;
+
+        _currentCameraState.EnterState(_playerContext);
     }
     #endregion
     #region Helper Functions
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public PlayerInputSnapshot CreateSnapshot()
+    {
+        PlayerInputSnapshot snapshot = new PlayerInputSnapshot
+        {
+            Move = _input.CurrentMovementInput,
+            Look = _input.CurrentLookInput,
+            MovePressed = _input.IsMovementPressed,
+
+            SprintPressed = _input.IsSprintPressed,
+            SprintToggle = _input.SprintToggle,
+
+            JumpPressed = _input.IsJumpPressedThisFrame,
+            JumpHeld = _input.IsJumpPressed,
+
+            DashPressed = _input.IsDashPressedThisFrame,
+            DashHeld = _input.IsDashPressed,
+
+            AttackHeld = _input.AttackHeld,
+            AttackPressed = _input.AttackPressed,
+            AttackReleased = _lastAttackPressed && !_input.AttackHeld,
+
+            ReloadPressed = _input.ReloadPressed,
+
+            AmmoPrevious = _input.WeaponPrevious,
+            AmmoNext = _input.WeaponNext,
+            SwitchWeapon = _input.SwitchAmmoPressed,
+            AimMode = _input.AimToggle
+        };
+        _lastAttackPressed = _input.AttackHeld;
+        return snapshot;
+    }
+
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         Rigidbody rb = hit.collider.attachedRigidbody;
@@ -133,32 +201,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ─────────────── Jump ─────────────── 
-    /// <summary>
-    /// Initialize jump variables 
-    /// </summary>
-    /// <param name="context"> Player Context to be Modified </param>
-    private void SetupJumpVariables(PlayerContext context)
+    private void SetupVariables(PlayerContext context)
     {
-        float timeToApex = context.Variables.maxJumpTime * 0.5f;
-        context.TimeToApex = timeToApex;
-        context.JumpGravity = -2f * context.Variables.maxJumpHeight / (timeToApex * timeToApex);
-        context.InitialJumpVelocity = 2f * context.Variables.maxJumpHeight / timeToApex;
-    }
 
-    // ─────────────── Dash ─────────────── 
-    /// <summary>
-    /// Initialize Dash variables
-    /// </summary>
-    /// <param name="context"> Player Context to be Modified </param>
-    private void SetupDashVariables(PlayerContext context)
-    {
+        // ------------ Jump ------------
+        float jumpTimeToApex = context.Variables.maxJumpDuration * 0.5f;
+        context.JumpTimeToApex = jumpTimeToApex;
+        context.JumpGravity = -2f * context.Variables.maxJumpHeight / (jumpTimeToApex * jumpTimeToApex);
+        context.InitialJumpVerticalVelocity = 2f * context.Variables.maxJumpHeight / jumpTimeToApex;
+
+        // ------------ Dash ------------
+        float dashApexTime = context.Variables.dashDuration;
+
         context.DashCharges = context.Variables.maxDashCharges;
+        context.DashGravity = context.Variables.dashApexHeight / (dashApexTime * dashApexTime);
+        context.InitialDashVerticalVelocity = Mathf.Sqrt(2f * context.JumpGravity * context.Variables.dashApexHeight);
+        context.InitialDashHorizontalVelocity = context.Variables.dashDistance / context.Variables.dashDuration;
 
-        float timeToApex = context.Variables.dashDuration * 0.5f;
-
-        context.DashGravity = -2f * context.Variables.samllDashJumpHeight / (timeToApex * timeToApex);
-        context.InitialDashVelocity = 2f * context.Variables.samllDashJumpHeight / timeToApex;
+        context.CurrentGravity = context.JumpGravity;
     }
 
     /// <summary>

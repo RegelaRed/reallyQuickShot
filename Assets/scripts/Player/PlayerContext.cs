@@ -6,25 +6,27 @@ public class PlayerContext
     public PlayerInputBuffer InputBuffer;
 
     public PlayerVariables Variables;
-    public PlayerMotor PlayerMotor;
 
+    // -------- Motor Variables --------
+    public float CurrentGravity;
+    public float CurrentSpeed;
 
     // -------- Ground --------
     public bool IsGrounded;
 
     // -------- Jump -------- 
-    public float InitialJumpVelocity;
-    public float JumpGravity;
+    public float InitialJumpVerticalVelocity;
     public float JumpIntervalTimer;
-    public float TimeToApex;
+    public float JumpTimeToApex;
+    public float JumpGravity;
     // -------- Dash --------
     public int DashCharges;
-    public float InitialDashVelocity;
-    public float DashGravity;
-    public float DashIntervalTimer;
+    public float InitialDashVerticalVelocity;
+    public float InitialDashHorizontalVelocity;
+    public float CanDashIntervalTimer;
     public float DashRegenTimer;
-
     public Vector3 DashDirection;
+    public float DashGravity;
 
     // -------- Tiemrs --------
     public float DeltaTime;
@@ -35,8 +37,8 @@ public class PlayerContext
         if (JumpIntervalTimer > 0f)
             JumpIntervalTimer -= DeltaTime;
 
-        if (DashIntervalTimer > 0f)
-            DashIntervalTimer -= DeltaTime;
+        if (CanDashIntervalTimer > 0f)
+            CanDashIntervalTimer -= DeltaTime;
 
         if (DashRegenTimer > 0f)
         {

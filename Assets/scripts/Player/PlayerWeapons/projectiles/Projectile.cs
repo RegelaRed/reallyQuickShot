@@ -4,12 +4,12 @@ public class Projectile : MonoBehaviour
 {
     private ProjectileData _stats;
     private Rigidbody _rb;
-    private float _aliveTime;
+    private float _aliveTimer;
     private bool _hasHit;
-    private Vector3 _dir;
+    private bool _destroyIssued = false;
 
     public ProjectileData Stats => _stats;
-    public bool ShouldDestroy => _aliveTime >= _stats.lifeTime || _hasHit;
+    public bool ShouldDestroy => _aliveTimer >= _stats.lifeTime || _hasHit;
 
     /// <summary>sets all necessary data on creation</summary>
     /// <param name="stats">ProjectileData for initializing behaviour</param>
@@ -25,12 +25,20 @@ public class Projectile : MonoBehaviour
         _rb.velocity = velocity;
     }
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
         Vector3 rbVelocity = _rb.velocity;
         //set the prefab facing direction
         if (rbVelocity.magnitude > Mathf.Epsilon)
             transform.rotation = Quaternion.LookRotation(rbVelocity);
+
+        _aliveTimer += Time.deltaTime;
+
+        if ((_aliveTimer >= _stats.lifeTime) && !_destroyIssued)
+        {
+            Destroy(gameObject, 5f);
+            _destroyIssued = true;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)

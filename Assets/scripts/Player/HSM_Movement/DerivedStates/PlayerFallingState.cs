@@ -1,27 +1,31 @@
+using UnityEngine;
+
 public class PlayerFallingState : PlayerBaseState
 {
-    public PlayerFallingState(PlayerController _ctx, PlayerStateFactory _factory)
-     : base(_ctx, _factory) { }
+    public PlayerFallingState(PlayerStateFactory stateFactory, PlayerMotor playerMotor)
+    : base(stateFactory, playerMotor)
+    { }
+
     public override void EnterState(PlayerContext context)
     {
-        context.PlayerMotor.SetGravity(context.JumpGravity);
+        context.CurrentGravity = context.JumpGravity;
     }
 
     public override void ExitState(PlayerContext context) { }
 
     public override void UpdateState(PlayerContext context)
     {
-        context.PlayerMotor.SetAirMovementInput(context);
+        Motor.SetAirMovementInput(context);
         CheckSwitchState(context);
     }
 
-    public override void CheckSwitchState(PlayerContext context)
+    public override PlayerBaseState CheckSwitchState(PlayerContext context)
     {
-
         if (context.IsGrounded)
-            SwitchStates(Factory.Grounded(), context);
+            return Factory.Grounded();
         else if (context.InputBuffer.JumpBufferActive && JumpRules.CanJump(context))
-            SwitchStates(Factory.Jump(), context);
+            return Factory.Jump();
+        return this;
     }
 
     public override void InitializeSubState(PlayerContext context) { }

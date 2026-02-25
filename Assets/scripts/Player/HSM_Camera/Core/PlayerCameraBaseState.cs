@@ -5,6 +5,7 @@ public abstract class PlayerCameraBaseState
     private bool _isRootState = false;
     private PlayerController _ctx;
     private PlayerCameraStateFactory _factory;
+    private PlayerMotor _playerMotor;
     private PlayerCameraBaseState _currentSuperState;
     private PlayerCameraBaseState _currentSubState;
 
@@ -17,30 +18,37 @@ public abstract class PlayerCameraBaseState
     private float _sensY;
 
     //Getter/Setters
-    public bool IsRootState { get { return _isRootState; } set { _isRootState = value; } }
-    public PlayerController Ctx { get { return _ctx; } }
-    public PlayerCameraStateFactory Factory { get { return _factory; } }
-    public PlayerCameraBaseState CurrentSuperState { get { return _currentSuperState; } }
-    public PlayerCameraBaseState CurrentSubState { get { return _currentSubState; } }
+    public bool IsRootState { get => _isRootState; set => _isRootState = value; }
+    public PlayerController Ctx => _ctx;
+    public PlayerCameraStateFactory Factory => _factory;
+    public PlayerMotor Motor => _playerMotor;
+    public PlayerCameraBaseState CurrentSuperState => _currentSuperState;
+    public PlayerCameraBaseState CurrentSubState => _currentSubState;
 
-    public float Pitch { get { return _pitch; } set { _pitch = value; } }
-    public float Yaw { get { return _yaw; } set { _yaw = value; } }
-    public float MinPitch { get { return _minPitch; } set { _minPitch = value; } }
-    public float MaxPitch { get { return _maxPitch; } set { _maxPitch = value; } }
+    public float Pitch { get => _pitch; set => _pitch = value; }
+    public float Yaw { get => _yaw; set => _yaw = value; }
+    public float MinPitch { get => _minPitch; set => _minPitch = value; }
+    public float MaxPitch { get => _maxPitch; set => _maxPitch = value; }
 
-    //constructor
+    //constructors
     public PlayerCameraBaseState(PlayerController ctx, PlayerCameraStateFactory factory)
     {
         _ctx = ctx;
         _factory = factory;
+    }
+    public PlayerCameraBaseState(PlayerController ctx, PlayerCameraStateFactory factory, PlayerMotor playerMotor)
+    {
+        _ctx = ctx;
+        _factory = factory;
+        _playerMotor = playerMotor;
     }
 
     //Default States
     public abstract void EnterState(PlayerContext context);
     public abstract void ExitState(PlayerContext context);
     public abstract void UpdateState(PlayerContext context);
-    public abstract void CheckSwitchState(PlayerContext context);
-    protected void SwitchStates(PlayerCameraBaseState newState, PlayerContext context)
+    public abstract PlayerCameraBaseState CheckSwitchState(PlayerContext context);
+    public void SwitchStates(PlayerCameraBaseState newState, PlayerContext context)
     {
         newState.Yaw = Yaw;
         newState.Pitch = Pitch;

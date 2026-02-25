@@ -2,13 +2,15 @@ using Unity.VisualScripting;
 
 public class PlayerGroundedState : PlayerBaseState
 {
-    public PlayerGroundedState(PlayerController _ctx, PlayerStateFactory _factory) : base(_ctx, _factory)
+    public PlayerGroundedState(PlayerStateFactory stateFactory, PlayerMotor playerMotor)
+    : base(stateFactory, playerMotor)
     { }
+
     // ------------ Enter State ------------
     public override void EnterState(PlayerContext context)
     {
-        context.PlayerMotor.SetGravity(context.Variables.gravity);
-        context.PlayerMotor.SetSpeed(context.Variables.walkSpeed);
+        context.CurrentGravity = context.JumpGravity;
+        context.CurrentSpeed = context.Variables.walkSpeed;
         InitializeSubState(context);
     }
     // ------------ Enter State ------------
@@ -20,28 +22,28 @@ public class PlayerGroundedState : PlayerBaseState
 
     public override void UpdateState(PlayerContext context)
     {
-        CheckSwitchState(context);
         UpdateSubstate(context);
     }
 
-    public override void CheckSwitchState(PlayerContext context)
+    public override PlayerBaseState CheckSwitchState(PlayerContext context)
     {
         // ------------ Jump ------------
         if (context.InputBuffer.JumpBufferActive && JumpRules.CanJump(context))
         {
-            SwitchStates(Factory.Jump(), context);
+            return Factory.Jump();
         }
         // ------------ Dash ------------
         else if (context.InputBuffer.DashBufferActive && DashRules.CanDash(context))
         {
             DashRules.Consume(context);
 
-            SwitchStates(Factory.Dash(), context);
+            return Factory.Dash();
         }
         else if (!context.IsGrounded)
         {
-            SwitchStates(Factory.Falling(), context);
+            return Factory.Falling();
         }
+        return this;
     }
 
     private void UpdateSubstate(PlayerContext context)

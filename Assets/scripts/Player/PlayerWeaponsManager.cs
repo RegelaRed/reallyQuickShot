@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class PlayerWeaponsManager : MonoBehaviour
@@ -8,12 +9,12 @@ public class PlayerWeaponsManager : MonoBehaviour
     // ─────────────── Scene References ─────────────── 
 
     [Header("Scene References")]
-    [SerializeField] private PlayerInputHandler _playerInput;
-    [SerializeField] private Spawner _spawner;
 
     [SerializeField] private Transform _weaponPositionIdle;
     [SerializeField] private Transform _weaponPositionActive;
     [SerializeField] private Transform _orientation;
+    private PlayerInputHandler _playerInput;
+    private Spawner _spawner;
 
     // ─────────────── Weapon Data ─────────────── 
 
@@ -33,8 +34,8 @@ public class PlayerWeaponsManager : MonoBehaviour
 
     private void Awake()
     {
-        _playerInput ??= GetComponent<PlayerInputHandler>();
-        _spawner ??= GetComponent<Spawner>();
+        _playerInput ??= GetComponent<PlayerInputHandler>() ?? this.AddComponent<PlayerInputHandler>();
+        _spawner ??= GetComponent<Spawner>() ?? this.AddComponent<Spawner>();
 
         _weaponContext.Spawner = _spawner;
         _weaponContext.Orientation = _orientation;

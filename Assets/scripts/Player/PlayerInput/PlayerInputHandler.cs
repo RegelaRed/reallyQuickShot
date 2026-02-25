@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -28,7 +29,6 @@ public class PlayerInputHandler : MonoBehaviour
     private bool _attackHeld;
     private bool _attackPressed;
     private bool _reloadPressed;
-    private bool _lastAttackPressed;
     // ------------ Weapon switching ------------ 
     private bool _weaponPrevious;
     private bool _weaponNext;
@@ -37,34 +37,35 @@ public class PlayerInputHandler : MonoBehaviour
     #endregion
     #region Getters/Setters
     // ------------ Walk ------------ 
-    public Vector2 CurrentMovementInput { get { return _currentMovementInput; } }
-    public bool IsMovementPressed { get { return _isMovementPressed; } }
+    public Vector2 CurrentMovementInput => _currentMovementInput;
+    public bool IsMovementPressed => _isMovementPressed;
     // ------------ Sprint ------------ 
-    public bool IsSprintPressed { get { return _isSprintPressed; } }
-    public bool SprintToggle { get { return _sprintToggle; } }
+    public bool IsSprintPressed => _isSprintPressed;
+    public bool SprintToggle => _sprintToggle;
     // ------------ Jump ------------ 
-    public float JumpBufferTimer { get { return _jumpBufferTimer; } set { _jumpBufferTimer = value; } }
-    public bool JumpBufferActive { get { return _jumpBufferTimer > 0f; } }
-    public bool IsJumpPressedThisFrame { get { return _isJumpPressedThisFrame; } }
-    public bool IsJumpPressed { get { return _isJumpPressed; } }
+    public float JumpBufferTimer { get => _jumpBufferTimer; set => _jumpBufferTimer = value; }
+    public bool JumpBufferActive => _jumpBufferTimer > 0f;
+    public bool IsJumpPressedThisFrame => _isJumpPressedThisFrame;
+    public bool IsJumpPressed => _isJumpPressed;
     // ------------ Dash ------------ 
-    public float DashBufferTimer { get { return _dashBufferTimer; } set { _dashBufferTimer = value; } }
-    public bool DashBufferActive { get { return _dashBufferTimer > 0f; } }
-    public bool IsDashPressedThisFrame { get { return _isDashPressedThisFrame; } }
-    public bool IsDashPressed { get { return _isDashPressed; } }
+    public float DashBufferTimer { get => _dashBufferTimer; set => _dashBufferTimer = value; }
+    public bool DashBufferActive => _dashBufferTimer > 0f;
+    public bool IsDashPressedThisFrame => _isDashPressedThisFrame;
+    public bool IsDashPressed => _isDashPressed;
     // ------------ Camera ------------ 
-    public Vector2 CurrentLookInput { get { return _currentLookInput; } }
+    public Vector2 CurrentLookInput => _currentLookInput;
     // ------------ Attack ------------ 
-    public bool AttackHeld { get { return _attackHeld; } }
-    public bool AttackPressed { get { return _attackPressed; } }
-    public bool ReloadPressed { get { return _reloadPressed; } }
+    public bool AttackHeld => _attackHeld;
+    public bool AttackPressed => _attackPressed;
+    public bool ReloadPressed => _reloadPressed;
     // ------------ Ranged ------------ 
-    public bool IsAiming { get { return _attackHeld || _aimToggle; } }
+    public bool IsAiming => _attackHeld || _aimToggle;
+    public bool AimToggle => _aimToggle;
 
     // ------------ Weapon switching ------------ 
-    public bool WeaponPrevious { get { return _weaponPrevious; } }
-    public bool WeaponNext { get { return _weaponNext; } }
-    public bool SwitchAmmoPressed { get { return _switchAmmoPressed; } }
+    public bool WeaponPrevious => _weaponPrevious;
+    public bool WeaponNext => _weaponNext;
+    public bool SwitchAmmoPressed => _switchAmmoPressed;
 
     #endregion
     //------------------------------------------------
@@ -114,45 +115,10 @@ public class PlayerInputHandler : MonoBehaviour
         _weaponPrevious = false;
         _switchAmmoPressed = false;
         //delays
-        float T = Time.deltaTime;
-        if (_jumpBufferTimer > 0f) _jumpBufferTimer -= T;
-        if (_dashBufferTimer > 0f) _dashBufferTimer -= T;
+        float deltaTime = Time.deltaTime;
+        if (_jumpBufferTimer > 0f) _jumpBufferTimer -= deltaTime;
+        if (_dashBufferTimer > 0f) _dashBufferTimer -= deltaTime;
     }
-
-
-    public PlayerInputSnapshot CreateSnapshot()
-    {
-        _lastAttackPressed = _attackHeld;
-        return new PlayerInputSnapshot
-        {
-            Move = _currentMovementInput,
-            Look = _currentLookInput,
-            MovePressed = _isMovementPressed,
-
-            SprintPressed = _isSprintPressed,
-            SprintToggle = _sprintToggle,
-
-            JumpPressed = _isJumpPressedThisFrame,
-            JumpHeld = _isJumpPressed,
-
-            DashPressed = _isDashPressedThisFrame,
-            DashHeld = _isDashPressed,
-
-            AttackHeld = _attackHeld,
-            AttackPressed = _attackPressed,
-            AttackReleased = _lastAttackPressed && !_attackHeld,
-
-            ReloadPressed = _reloadPressed,
-
-            AmmoPrevious = _weaponPrevious,
-            AmmoNext = _weaponNext,
-            SwitchWeapon = _switchAmmoPressed,
-            AimMode = _aimToggle
-        };
-    }
-
-
-
     #region calback references
     // ------------ Movement ------------ 
     void ReadMovementInput(InputAction.CallbackContext context)

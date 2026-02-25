@@ -1,23 +1,36 @@
 public abstract class PlayerBaseState
 {
+    #region References
     private bool _isRootState = false;
     /// <summary>PlayerController Reference</summary>
-    private PlayerController _ctx;
-    /// <summary>PlayerStateFactory Reference</summary>
+    // private PlayerController _ctx;
     private PlayerStateFactory _factory;
+    private PlayerMotor _playerMotor;
     private PlayerBaseState _currentSubState;
     private PlayerBaseState _currentSuperState;
 
-    public bool IsSuperState { get { return _isRootState; } set { _isRootState = value; } }
+    public bool IsSuperState { get => _isRootState; set => _isRootState = value; }
 
-    public PlayerStateFactory Factory { get { return _factory; } }
-    public PlayerBaseState CurrentSubState { get { return _currentSubState; } }
-    public PlayerBaseState CurrentSuperState { get { return _currentSuperState; } }
-    public PlayerBaseState(PlayerController ctx, PlayerStateFactory stateFactory)
+    /// <summary>PlayerStateFactory Reference</summary>
+    public PlayerStateFactory Factory => _factory;
+
+    /// <summary>PlayerMotor Reference </summary>
+    public PlayerMotor Motor => _playerMotor;
+    public PlayerBaseState CurrentSubState => _currentSubState;
+    public PlayerBaseState CurrentSuperState => _currentSuperState;
+
+    #endregion
+
+    #region Constructors
+    public PlayerBaseState(PlayerStateFactory stateFactory, PlayerMotor playerMotor)
     {
-        _ctx = ctx;
         _factory = stateFactory;
+        _playerMotor = playerMotor;
     }
+    #endregion
+
+    #region Base State Functions
+
     /// <summary>
     /// Called once when the state is Entered
     /// </summary>
@@ -37,7 +50,7 @@ public abstract class PlayerBaseState
     /// Evaluate state switch conditions and switches to new state
     /// </summary>
     /// <param name="context">Provides runtime data and input information required by player states</param>
-    public abstract void CheckSwitchState(PlayerContext context);
+    public abstract PlayerBaseState CheckSwitchState(PlayerContext context);
     /// <summary>
     /// Initialize default substate for this state
     /// </summary>
@@ -49,7 +62,7 @@ public abstract class PlayerBaseState
     /// </summary>
     /// <param name="newState">NewState to transition into</param>
     /// <param name="context">Provides runtime data and input information required by player states</param>
-    protected void SwitchStates(PlayerBaseState newState, PlayerContext context)
+    public void SwitchStates(PlayerBaseState newState, PlayerContext context, PlayerController ctx)
     {
         //current state exit
         ExitState(context);
@@ -60,7 +73,7 @@ public abstract class PlayerBaseState
         if (IsSuperState)
         {
             //switch current state context
-            _ctx.CurrentMovementState = newState;
+            ctx.CurrentMovementState = newState;
         }
         else if (_currentSuperState != null)
             _currentSuperState.SetSubState(newState, context);
@@ -107,4 +120,5 @@ public abstract class PlayerBaseState
         newSubState.SetSuperState(this);
         newSubState.EnterState(context);
     }
+    #endregion
 }

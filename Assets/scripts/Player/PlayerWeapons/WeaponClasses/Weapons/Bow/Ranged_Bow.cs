@@ -26,7 +26,7 @@ public class Ranged_Bow : WeaponsBase
     [SerializeField] private Transform ProjectileLaunchPoint;
 
     // ------------  ------------
-    private Spawner _spawner;
+    // private Spawner _spawner;
     private ProjectileData _currentAmmoData;
 
     // ------------  ------------
@@ -100,7 +100,7 @@ public class Ranged_Bow : WeaponsBase
     public override void Timers(WeaponContext weaponContext)
     {
         _reloadTimer -= weaponContext.DeltaTime;
-        if (_reloadTimer <= 0f && CurrentAmmoCount == 0)
+        if (_reloadTimer <= 0f && CurrentAmmoCount < _weaponData.maxAmmo)
         {
             Debug.Log($"Relaod Complete");
             CurrentAmmoCount = _weaponData.maxAmmo;
@@ -118,8 +118,7 @@ public class Ranged_Bow : WeaponsBase
 
         // Debug.Log($"Current Ammo count {CurrentAmmoCount}");
         // Debug.Log($"Current Charge {_currentCharge}");
-        _spawner.CreateProjectile(_currentAmmoData, charge, ProjectileLaunchPoint);
-        _currentCharge = 0f;
+        weaponContext.Spawner.CreateProjectile(_currentAmmoData, charge, ProjectileLaunchPoint);
     }
 
     /// <summary>will switch ammo to next or previous based on direction passed</summary>
@@ -158,7 +157,7 @@ public class Ranged_Bow : WeaponsBase
         _ammoCounts = new List<int>(_ammoDataObject.Count);
         if (GetComponent<Spawner>() == null)
             this.AddComponent<Spawner>();
-        _spawner = GetComponent<Spawner>();
+        weaponContext.Spawner = GetComponent<Spawner>();
 
         for (int i = 0; i < _ammoDataObject.Count; i++)
         {
@@ -166,7 +165,6 @@ public class Ranged_Bow : WeaponsBase
         }
         CurrentAmmoCount = _weaponData.maxAmmo;
         EquipAmmo(0);
-        Equip(weaponContext);
     }
 
     #endregion

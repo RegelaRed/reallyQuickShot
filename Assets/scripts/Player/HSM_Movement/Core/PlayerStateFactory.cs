@@ -1,33 +1,28 @@
+using UnityEngine;
+
 /// <summary>
 /// Responsible for creating and configuring player state instances.<para/>
 /// Provides factory methods for both root and sub states.
 /// </summary>
 public class PlayerStateFactory
 {
-    private PlayerController _ctx;
-    public PlayerStateFactory(PlayerController _currentContext) { _ctx = _currentContext; }
+    private PlayerMotor _playerMotor;
+    public PlayerStateFactory(PlayerMotor playerMotor)
+    {
+        _playerMotor = playerMotor;
+    }
     //Super States
-    public PlayerBaseState Grounded()
-    {
-        return new PlayerGroundedState(_ctx, this) { IsSuperState = true };
-    }
-    public PlayerBaseState Falling()
-    {
-        return new PlayerFallingState(_ctx, this) { IsSuperState = true };
-    }
-    public PlayerBaseState Jump()
-    {
-        return new PlayerJumpState(_ctx, this) { IsSuperState = true };
-    }
-    public PlayerBaseState Dash()
-    {
-        return new PlayerDashState(_ctx, this) { IsSuperState = true };
-    }
+    /// <summary>
+    /// This is a SuperState
+    /// </summary>
+    /// <returns></returns>
+    public PlayerBaseState Grounded() => new PlayerGroundedState(this, _playerMotor) { IsSuperState = true };
+    public PlayerBaseState Falling() => new PlayerFallingState(this, _playerMotor) { IsSuperState = true };
+    public PlayerBaseState Jump() => new PlayerJumpState(this, _playerMotor) { IsSuperState = true };
+    public PlayerBaseState Dash() => new PlayerDashState(this, _playerMotor) { IsSuperState = true };
 
     //Sub States
-    public PlayerBaseState Idle() { return new PlayerIdleState(_ctx, this); }
-    public PlayerBaseState Walk() { return new PlayerWalkState(_ctx, this); }
-    public PlayerBaseState Sprint() { return new PlayerSprintState(_ctx, this); }
-    public PlayerBaseState JumpAscending() { return new PlayerJumpAscending(_ctx, this); }
-    public PlayerBaseState JumpDescending() { return new PlayerJumpDescending(_ctx, this); }
+    public PlayerBaseState Idle() => new PlayerIdleState(this, _playerMotor);
+    public PlayerBaseState Walk() => new PlayerWalkState(this, _playerMotor);
+    public PlayerBaseState Sprint() => new PlayerSprintState(this, _playerMotor);
 }

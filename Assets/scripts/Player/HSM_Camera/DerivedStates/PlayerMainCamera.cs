@@ -1,11 +1,10 @@
 using UnityEngine;
 public class PlayerMainCamera : PlayerCameraBaseState
 {
-    public PlayerMainCamera(PlayerController _ctx, PlayerCameraStateFactory _factory)
-    : base(_ctx, _factory)
-    {
+    public PlayerMainCamera(PlayerController ctx, PlayerCameraStateFactory factory, PlayerMotor playerMotor)
+    : base(ctx, factory, playerMotor)
+    { }
 
-    }
     public override void EnterState(PlayerContext context)
     {
         SetSensitivity(context.Variables.horizontalCameraSensitivity, context.Variables.verticalCameraSensitivity);
@@ -19,14 +18,15 @@ public class PlayerMainCamera : PlayerCameraBaseState
         FaceDirection(context);
         CheckSwitchState(context);
     }
-    public override void CheckSwitchState(PlayerContext context)
+    public override PlayerCameraBaseState CheckSwitchState(PlayerContext context)
     {
         if (context.Input.AimMode)
-            SwitchStates(Factory.AimCamera(), context);
+            return Factory.AimCamera();
+        return this;
     }
     private void FaceDirection(PlayerContext context)
     {
-        Vector3 moveDir = context.PlayerMotor.FinalMoveVector;
+        Vector3 moveDir = Motor.FinalMoveVector;
         moveDir.y = 0f;
         if (moveDir.sqrMagnitude > 0.1f)
         {

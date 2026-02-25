@@ -1,15 +1,12 @@
-using UnityEngine;
-
 public class PlayerIdleState : PlayerBaseState
 {
-    public PlayerIdleState(PlayerController _ctx, PlayerStateFactory _factory)
-    : base(_ctx, _factory) { }
-    public override void EnterState(PlayerContext context)
-    {
-        context.PlayerMotor.SetGroundMovementInput(context);
-    }
+    public PlayerIdleState(PlayerStateFactory stateFactory, PlayerMotor playerMotor)
+    : base(stateFactory, playerMotor)
+    { }
+
+    public override void EnterState(PlayerContext context) { }
     public override void UpdateState(PlayerContext context) { }
     public override void ExitState(PlayerContext context) { }
-    public override void CheckSwitchState(PlayerContext context) { }
+    public override PlayerBaseState CheckSwitchState(PlayerContext context) { return this; }
     public override void InitializeSubState(PlayerContext context) { }
 }

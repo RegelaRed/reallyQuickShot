@@ -1,11 +1,10 @@
 using UnityEngine;
 public class PlayerAimCamera : PlayerCameraBaseState
 {
-    public PlayerAimCamera(PlayerController _ctx, PlayerCameraStateFactory _factory)
-    : base(_ctx, _factory)
+    public PlayerAimCamera(PlayerController ctx, PlayerCameraStateFactory factory) : base(ctx, factory)
     {
-
     }
+
     public override void EnterState(PlayerContext context)
     {
         SetSensitivity(context.Variables.horizontalCameraSensitivity, context.Variables.verticalCameraSensitivity);
@@ -20,10 +19,11 @@ public class PlayerAimCamera : PlayerCameraBaseState
         FaceDirection();
         CheckSwitchState(context);
     }
-    public override void CheckSwitchState(PlayerContext context)
+    public override PlayerCameraBaseState CheckSwitchState(PlayerContext context)
     {
         if (!context.Input.AimMode)
-            SwitchStates(Factory.MainCamera(), context);
+            return Factory.MainCamera();
+        return this;
     }
     private void FaceDirection()
     {
