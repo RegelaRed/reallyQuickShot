@@ -14,26 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 8
   sprintSpeed: 12
-  maxJumpHeight: 5
-  maxJumpTime: 1.2
-  jumpCutMultiplier: 0.1
+  groundDeceleration: 14
+  maxJumpHeight: 2
+  maxJumpDuration: 0.8
   jumpBufferTime: 0.4
   jumpInterval: 0.1
   maxDashCharges: 2
-  dashInterval: 0.1
-  dashRegenTime: 0.4
-  dashDuration: 0.6
-  dashDistance: 6
-  samllDashJumpHeight: 0.6
+  dashInterval: 0.2
+  dashRegenTime: 1
+  dashDuration: 0.2
+  dashDistance: 4
+  dashApexHeight: 0.5
   dashBufferTimer: 0.4
-  gravity: -10
   airMoveSpeed: 0.2
   maxAirSpeed: 2
-  airControl: 18
+  airControl: 9
   pushForce: 1
-  playerBodyRotationSpeed: 0.09
-  horizontalCameraSensitivity: 50
-  verticalCameraSensitivity: 50
+  playerBodyRotationSpeed: 16
+  horizontalCameraSensitivity: 20
+  verticalCameraSensitivity: 20
   mainCameraPitchMin: -20
   mainCameraPitchMax: 60
   aimCameraPitchMin: -50

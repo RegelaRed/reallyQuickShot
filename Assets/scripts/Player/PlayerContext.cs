@@ -1,38 +1,45 @@
-using UnityEngine;
-
+/// <summary>
+/// Runtime data container shared across player systems.
+/// Holds input, ability state, timers and movement variables.
+/// </summary>
 public class PlayerContext
 {
+    // -------- Core --------
+
     public PlayerInputSnapshot Input;
     public PlayerInputBuffer InputBuffer;
-
     public PlayerVariables Variables;
 
-    // -------- Motor Variables --------
+    public float DeltaTime;
+
+    // -------- Motor --------
+
     public float CurrentGravity;
     public float CurrentSpeed;
 
-    // -------- Ground --------
     public bool IsGrounded;
 
-    // -------- Jump -------- 
+    // -------- Jump --------
+
+    public bool IsJumping;
     public float InitialJumpVerticalVelocity;
     public float JumpIntervalTimer;
     public float JumpTimeToApex;
     public float JumpGravity;
+
     // -------- Dash --------
+
     public int DashCharges;
     public float InitialDashVerticalVelocity;
     public float InitialDashHorizontalVelocity;
     public float CanDashIntervalTimer;
     public float DashRegenTimer;
-    public Vector3 DashDirection;
     public float DashGravity;
 
-    // -------- Tiemrs --------
-    public float DeltaTime;
-
-
-    public void AbilityTimers()
+    /// <summary>
+    /// Updates all ability cooldown timers.
+    /// </summary>
+    public void UpdateAbilityTimers()
     {
         if (JumpIntervalTimer > 0f)
             JumpIntervalTimer -= DeltaTime;
@@ -43,8 +50,12 @@ public class PlayerContext
         if (DashRegenTimer > 0f)
         {
             DashRegenTimer -= DeltaTime;
+
             if (DashRegenTimer <= 0f)
+            {
+                DashRegenTimer = 0f;
                 DashRules.Regenerate(this);
+            }
         }
     }
 }

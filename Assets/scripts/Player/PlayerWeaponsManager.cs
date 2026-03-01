@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class PlayerWeaponsManager : MonoBehaviour
@@ -13,8 +12,8 @@ public class PlayerWeaponsManager : MonoBehaviour
     [SerializeField] private Transform _weaponPositionIdle;
     [SerializeField] private Transform _weaponPositionActive;
     [SerializeField] private Transform _orientation;
-    private PlayerInputHandler _playerInput;
-    private Spawner _spawner;
+    [SerializeField] private PlayerInputHandler _playerInput;
+    [SerializeField] private Spawner _spawner;
 
     // ─────────────── Weapon Data ─────────────── 
 
@@ -47,21 +46,25 @@ public class PlayerWeaponsManager : MonoBehaviour
     }
     private void Update()
     {
-        CaptureInput();
+        _weaponContext = CaptureInput();
+        _wasAttackHeld = _playerInput.AttackHeld;
 
-        _currentWeapon?.UpdateWeapon(_weaponContext);
+        _currentWeapon?.TickWeapon(_weaponContext);
 
         if (_playerInput.WeaponNext)
             SwitchWeaponIndex();
+
         else if (_playerInput.WeaponPrevious)
             SwitchWeaponIndex(-1);
     }
+
     #endregion
     #region Initialization 
 
     /// <summary>Instanciate all Weapon Instances and Hides them</summary>
     private void InitializeWeapons()
     {
+        _weaponContext = CaptureInput();
         foreach (var prefab in _weaponPrefabs)
         {
             GameObject weaponObj = Instantiate(prefab, _weaponPositionIdle, false);
@@ -79,29 +82,30 @@ public class PlayerWeaponsManager : MonoBehaviour
     }
 
     #endregion
-    #region Input 
+    #region Input Snapshot
 
     /// <summary>Snapshot of Input for Weapons to read</summary>
-    private void CaptureInput()
+    private WeaponContext CaptureInput()
     {
-        _weaponContext.DeltaTime = Time.deltaTime;
+        return new WeaponContext
+        {
 
-        _weaponContext.AttackDirection = _orientation.forward;
+            DeltaTime = Time.deltaTime,
 
-        _weaponContext.AttackPressed = _playerInput.AttackPressed && !_wasAttackHeld;
-        _weaponContext.AttackHeld = _playerInput.AttackHeld;
-        _weaponContext.AttackReleased = !_playerInput.AttackHeld && _wasAttackHeld;
+            AttackDirection = _orientation.forward,
+            AttackPressed = _playerInput.AttackPressed && !_wasAttackHeld,
+            AttackHeld = _playerInput.AttackHeld,
+            AttackReleased = !_playerInput.AttackHeld && _wasAttackHeld,
 
-        _weaponContext.ReloadPressed = _playerInput.ReloadPressed;
+            ReloadPressed = _playerInput.ReloadPressed,
 
-        _weaponContext.WeaponPrevious = _playerInput.WeaponPrevious;
-        _weaponContext.WeaponNext = _playerInput.WeaponNext;
+            WeaponPrevious = _playerInput.WeaponPrevious,
+            WeaponNext = _playerInput.WeaponNext,
 
-        _weaponContext.AmmoSwitch = _playerInput.SwitchAmmoPressed;
+            AmmoSwitch = _playerInput.SwitchAmmoPressed,
 
-        _weaponContext.AimMode = _playerInput.IsAiming;
-
-        _wasAttackHeld = _playerInput.AttackHeld;
+            AimMode = _playerInput.IsAiming,
+        };
     }
 
     #endregion
@@ -111,6 +115,7 @@ public class PlayerWeaponsManager : MonoBehaviour
     private void SwitchWeaponIndex(int index = 1)
     {
         int nextIndex = (_currentWeaponIndex + index + _weaponList.Count) % _weaponList.Count;
+        if (nextIndex == 0) nextIndex = 1;
         EquipWeapon(nextIndex);
     }
 

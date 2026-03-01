@@ -7,12 +7,11 @@ public class PlayerVariables : ScriptableObject
     public float walkSpeed = 5;
     public float sprintSpeed = 8f;
     [Tooltip("values 1-30 for smooth falloff, 50+ for snappy stop")]
-    internal float groundDeceleration = 14;
+    public float groundDeceleration = 14;
 
     [Header("Jump")]
     public float maxJumpHeight = 1.4f;
     public float maxJumpDuration = 0.5f;
-    public float jumpCutMultiplier = 0.5f;
     public float jumpBufferTime = 0.4f;
     public float jumpInterval = 0.1f;
 
@@ -25,8 +24,6 @@ public class PlayerVariables : ScriptableObject
     public float dashApexHeight = 0.5f;
     public float dashBufferTimer = 0.2f;
 
-    [Header("Gravity")]
-    public float gravity = 10f;
     [Space]
     [Header("Air")]
     public float airMoveSpeed = 0.6f;

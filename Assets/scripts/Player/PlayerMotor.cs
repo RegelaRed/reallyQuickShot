@@ -1,134 +1,186 @@
-using System.Net.Http.Headers;
 using UnityEngine;
 
+/// <summary>
+/// Handles all player movement physics and CharacterController motion.
+/// <para/>
+/// Responsibilities:
+/// • Applies gravity
+/// • Calculates final movement vector
+/// • Moves CharacterController
+/// • Stores current movement velocities
+/// <para/>
+/// Movement logic decisions are handled by the movement state machine.
+/// PlayerMotor only executes movement physics.
+/// </summary>
 public class PlayerMotor : MonoBehaviour
 {
     #region References
-    // Cached references
+    // Cached scene references and runtime movement data
     [SerializeField] private CharacterController _controller;
     [SerializeField] private Transform _orientation;
 
     // Movement state
-    private float _verticalFloat;
-    private Vector3 _horizontalVelocity;
-    private float _currentGravity;
-    private float _currentSpeed;
+    /// <summary>
+    /// Vertical velocity affected by gravity and jumping.
+    /// Units: meters per second.
+    /// </summary>
+    private float _verticalVelocity;
+    /// <summary>
+    /// Horizontal movement direction vector.
+    /// Usually normalized.
+    /// </summary>
+    private Vector3 _moveDirection;
 
+    /// <summary>
+    /// Final movement vector passed to CharacterController.Move().
+    /// Includes both horizontal and vertical motion.
+    /// Units: meters per frame.
+    /// </summary>
     private Vector3 _finalMoveVector;
     //Getters and Setters
 
     //Upward force
-    public float VerticalVelocity { get => _verticalFloat; set => _verticalFloat = value; }
-    //gravity
-    public float Gravity => _currentGravity;
+    public float VerticalVelocity { get => _verticalVelocity; set => _verticalVelocity = value; }
     //movement
     public Vector3 FinalMoveVector => _finalMoveVector;
-    public float CurrentSpeed => _currentSpeed;
-    public Vector3 CurrentMovementVector => _horizontalVelocity;
-    public Vector3 HorizontalVelocityVector { get => _horizontalVelocity; set => _horizontalVelocity = value; }
-
+    public Vector3 CurrentMoveDirection => _moveDirection;
 
     #endregion
     #region Updates
+    /// <summary>
+    /// Initializes cached references and default movement values.
+    /// </summary>
     private void Awake()
     {
-        _currentSpeed = 1f;
         _controller ??= GetComponent<CharacterController>();
     }
 
-    public void UpdatePhysics(PlayerContext context)
+    /// <summary>
+    /// Updates movement physics for this frame.
+    /// <para/>
+    /// Steps:
+    /// 1. Apply gravity to vertical velocity
+    /// 2. Calculate final movement vector
+    /// 3. Move CharacterController
+    /// </summary>
+    public void TickPhysics(PlayerContext context)
     {
         ApplyGravity(context);
-        _finalMoveVector = CalculateFinalMoveVector(context);
-        _controller.Move(_finalMoveVector * Time.deltaTime);
+        _finalMoveVector = CalculateMoveVector(context);
+        _controller.Move(_finalMoveVector);
     }
 
     #endregion
     #region Calculations
+    /// <summary>
+    /// Applies gravity to vertical velocity.
+    /// <para/>
+    /// When grounded and moving downward, a small negative force
+    /// is applied to keep the CharacterController grounded.
+    /// </summary>
     private void ApplyGravity(PlayerContext context)
     {
 
-        if (context.IsGrounded && _verticalFloat < 0f)
+        if (context.IsGrounded && _verticalVelocity < 0f)
         {
             // small downward force to stay grounded
-            _verticalFloat = -2f;
+            _verticalVelocity = -2f;
             return;
         }
-        _verticalFloat += context.CurrentGravity * Time.deltaTime;
+        _verticalVelocity += context.CurrentGravity * Time.deltaTime;
     }
 
-    public Vector3 CalculateFinalMoveVector(PlayerContext context)
+    /// <summary>
+    /// Combines horizontal and vertical velocities into the final
+    /// movement vector applied this frame.
+    /// <para/>
+    /// Horizontal movement uses CurrentSpeed scaling.
+    /// Vertical movement uses accumulated vertical velocity.
+    /// </summary>
+    /// <returns>Movement vector in meters per frame</returns>
+    public Vector3 CalculateMoveVector(PlayerContext context)
     {
-        return (_horizontalVelocity * context.CurrentSpeed) + (Vector3.up * _verticalFloat);
+        Vector3 horizontalDir = _moveDirection * context.CurrentSpeed * context.DeltaTime;
+        Vector3 verticalVelocity = Vector3.up * _verticalVelocity * context.DeltaTime;
+        return horizontalDir + verticalVelocity;
     }
 
     #endregion
     #region public API
 
-    public void SetHorizontalVelocity(Vector3 direction)
-    {
-        _horizontalVelocity = direction.normalized;
-    }
-    public void SetVerticalVelocity(float force)
-    {
-        _verticalFloat = force;
-    }
     /// <summary>
-    /// sets the movement Vector for Moving on ground<para/>
-    /// also smooths speed transitions
+    /// Sets horizontal movement direction.
+    /// Direction is normalized before storing.
     /// </summary>
-    /// <param name="input"> Player Context to be pased in </param>
-    public void SetGroundMovementInput(PlayerContext context)
+    public void SetHorizontalDirectionVector(Vector3 direction) => _moveDirection = direction.normalized;
+
+    /// <summary>
+    /// Sets vertical velocity directly.
+    /// Typically used for jumping and dash impulses.
+    /// </summary>
+    /// <param name="verticalVelocity">Vertical velocity in meters per second</param>
+    public void SetVerticalVelocity(float verticalVelocity) => _verticalVelocity = verticalVelocity;
+
+    /// <summary>
+    /// Applies ground movement input.
+    /// <para/>
+    /// • Converts input into movement direction
+    /// • Applies deceleration when no input is present
+    /// • Produces smooth stopping behavior
+    /// </summary>
+    /// <param name="context">Current player context</param>
+    public void SetGroundMovementDirection(PlayerContext context)
     {
-        Vector3 move = NormalizedInput(context.Input.Move);
+        Vector3 move = NormalizedDirectionVector(context.Input.Move);
         move.y = 0f;
         if (move.magnitude > 0.1f)
         {
-            _horizontalVelocity = move;
+            _moveDirection = move;
         }
         else
         {
-            _horizontalVelocity = Vector3.MoveTowards(
-                _horizontalVelocity,
+            _moveDirection = Vector3.MoveTowards(
+                _moveDirection,
                 Vector3.zero,
                 context.Variables.groundDeceleration * context.DeltaTime
             );
         }
     }
-    /// <summary>
-    /// sets the movement Vector for Moving while in air, reduced movement sensitivity 
-    /// </summary>
-    /// <param name="context"> Player Context to be pased in </param>
-    public void SetAirMovementInput(PlayerContext context)
-    {
-        Vector3 move = NormalizedInput(context.Input.Move);
 
-        _horizontalVelocity = Vector3.MoveTowards(
-            _horizontalVelocity, move,
+    /// <summary>
+    /// Applies air movement input.
+    /// <para/>
+    /// Movement direction is gradually adjusted toward input direction
+    /// using air control acceleration.
+    /// <para/>
+    /// Final velocity is clamped to maximum air speed.
+    /// </summary>
+    /// <param name="context">Current player context</param>
+    public void SetAirMovementDirection(PlayerContext context)
+    {
+        Vector3 move = NormalizedDirectionVector(context.Input.Move);
+
+        _moveDirection = Vector3.MoveTowards(
+            _moveDirection, move,
             context.Variables.airMoveSpeed * context.Variables.airControl * Time.deltaTime
         );
-        _horizontalVelocity = Vector3.ClampMagnitude(_horizontalVelocity, context.Variables.maxAirSpeed);
+        _moveDirection = Vector3.ClampMagnitude(_moveDirection, context.Variables.maxAirSpeed);
     }
 
     /// <summary>
-    /// Normalizes and converts Vector2 Input to Vector3 
+    /// Converts 2D input axes into a world-space movement direction
+    /// relative to player orientation.
+    /// <para/>
+    /// Result is normalized and constrained to the horizontal plane.
     /// </summary>
-    /// <param name="input"> Vector2 of Input axis </param>
-    /// <returns> Vector3 normalized direction</returns>
-    private Vector3 NormalizedInput(Vector2 input)
+    /// <param name="input">Raw input axis values</param>
+    /// <returns>Normalized world-space movement direction</returns>
+    private Vector3 NormalizedDirectionVector(Vector2 input)
     {
         Vector3 move = _orientation.right * input.x + _orientation.forward * input.y;
         move.y = 0f;
 
         return move.normalized;
-    }
-    /// <summary>
-    /// Set Upward force for Jump
-    /// </summary>
-    /// <param name="upWardForce"> float Upward Force</param>
-    public void SetUpwardVelocity(float upWardForce)
-    {
-        _verticalFloat = upWardForce;
     }
     #endregion
 }

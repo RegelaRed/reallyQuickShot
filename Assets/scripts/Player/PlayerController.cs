@@ -1,13 +1,16 @@
 using Unity.VisualScripting;
 using UnityEngine;
 /// <summary>
-/// Player Controller Manages Player Behaviour
-/// Inputs, Scene References, Player Movement State Machine, Player Camera State Machine
-/// 
+/// Central player controller coordinating input, context updates,
+/// movement state machine, and camera state machine.
+/// <para/>
+/// Responsibilities:
+/// • Collect player input and create input snapshots
+/// • Maintain PlayerContext data
+/// • Run movement and camera state machines
+/// • Update PlayerMotor physics
+/// • Provide scene references to states
 /// </summary>
-/// <remarks>
-/// 
-/// </remarks>
 public class PlayerController : MonoBehaviour
 {
     #region References
@@ -25,7 +28,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("Player Data")]
     [SerializeField] private PlayerVariables _playerVariables;
-    [SerializeField] private LayerMask groundMask;
 
     [Header("Scripts")]
     [SerializeField] private PlayerInputHandler _input;
@@ -37,9 +39,18 @@ public class PlayerController : MonoBehaviour
     private bool _lastAttackPressed = false;
 
     // ─────────────── State Machines ─────────────── 
+    /// <summary>
+    /// Movement hierarchical state machine.
+    /// Root states: Grounded, Falling, Jump, Dash
+    /// Substates: Idle, Walk, Sprint
+    /// </summary>
     private PlayerBaseState _currentMovementState;
     private PlayerStateFactory _movementFactory;
 
+    /// <summary>
+    /// Camera state machine.
+    /// States: MainCamera, AimCamera
+    /// </summary>
     private PlayerCameraBaseState _currentCameraState;
     private PlayerCameraStateFactory _cameraFactory;
 
@@ -71,6 +82,16 @@ public class PlayerController : MonoBehaviour
     #region Update Methods
     // ─────────────── Unity Lifecycle ─────────────── 
 
+    /// <summary>
+    /// Initializes player systems and state machines.
+    /// <para/>
+    /// Order is important:
+    /// 1. Input & Motor setup
+    /// 2. Context creation
+    /// 3. Variable pre-calculation
+    /// 4. Movement FSM initialization
+    /// 5. Camera FSM initialization
+    /// </summary>
     private void Awake()
     {
         HideMouse();
@@ -101,29 +122,25 @@ public class PlayerController : MonoBehaviour
         _currentCameraState = _cameraFactory.MainCamera();
         _currentCameraState.EnterState(_playerContext);
     }
-    PlayerBaseState lastState;
-    PlayerBaseState activeState;
+
+    /// <summary>
+    /// Main update loop.
+    /// <para/>
+    /// Execution order:
+    /// 1. Create input snapshot
+    /// 2. Update timers and input buffer
+    /// 3. Update movement FSM
+    /// 4. Apply movement physics
+    /// 5. Update camera FSM
+    /// </summary>
     private void Update()
     {
-        activeState = _currentMovementState.CurrentSubState ?? _currentMovementState;
-        if (lastState != activeState)
-        {
-            Debug.Log("------------------------------------"
-                + System.Environment.NewLine
-                + $"current active state {activeState}");
 
-            Debug.Log($"current movement speed {_playerMotor.CurrentSpeed}");
-            Debug.Log($"current movement gravity {_playerMotor.Gravity}");
-            lastState = activeState;
-        }
-
-        _playerContext.Input = CreateSnapshot();
-
-        _playerContext.DeltaTime = Time.deltaTime;
+        _playerContext.Input = CreateInputSnapshot();
         _playerContext.IsGrounded = _characterController.isGrounded;
+        _playerContext.DeltaTime = Time.deltaTime;
 
-        _playerContext.DashDirection = GetDashDirection();
-        _playerContext.AbilityTimers();
+        _playerContext.UpdateAbilityTimers();
 
         _inputBuffer.Register(_playerContext.Input);
         _inputBuffer.Tick(Time.deltaTime);
@@ -131,34 +148,26 @@ public class PlayerController : MonoBehaviour
         //Movement State machine
         _currentMovementState.UpdateStates(_playerContext);
         var nextMove = _currentMovementState.CheckSwitchState(_playerContext);
-        if (nextMove != CurrentMovementState)
+        if (nextMove != null)
             _currentMovementState.SwitchStates(nextMove, _playerContext, this);
 
 
-        _playerMotor.UpdatePhysics(_playerContext);
+        _playerMotor.TickPhysics(_playerContext);
 
         //Camera State machine
         _currentCameraState.UpdateStates(_playerContext);
         var nextCam = _currentCameraState.CheckSwitchState(_playerContext);
-        if (nextCam != _currentCameraState)
+        if (nextCam != null)
             _currentCameraState.SwitchStates(nextCam, _playerContext);
     }
 
-    private void SwitchCameraState(PlayerCameraBaseState newState)
-    {
-        _currentCameraState.ExitState(_playerContext);
-
-        _currentCameraState = newState;
-
-        _currentCameraState.EnterState(_playerContext);
-    }
     #endregion
     #region Helper Functions
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    public PlayerInputSnapshot CreateSnapshot()
+    public PlayerInputSnapshot CreateInputSnapshot()
     {
         PlayerInputSnapshot snapshot = new PlayerInputSnapshot
         {
@@ -174,6 +183,7 @@ public class PlayerController : MonoBehaviour
 
             DashPressed = _input.IsDashPressedThisFrame,
             DashHeld = _input.IsDashPressed,
+            DashDirection = GetDashDirection(),
 
             AttackHeld = _input.AttackHeld,
             AttackPressed = _input.AttackPressed,
@@ -190,6 +200,10 @@ public class PlayerController : MonoBehaviour
         return snapshot;
     }
 
+    /// <summary>
+    /// Applies impulse force to rigidbodies when the player collides with them.
+    /// Only affects non-kinematic rigidbodies.
+    /// </summary>
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         Rigidbody rb = hit.collider.attachedRigidbody;
@@ -201,6 +215,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Pre-calculates physics constants used by movement states.
+    /// <para/>
+    /// Jump calculations use kinematic equations:
+    /// gravity = -2h / t²
+    /// velocity = 2h / t
+    /// <para/>
+    /// Dash calculations determine velocities required to reach
+    /// configured distance and height within dash duration.
+    /// </summary>
     private void SetupVariables(PlayerContext context)
     {
 
@@ -215,16 +239,21 @@ public class PlayerController : MonoBehaviour
 
         context.DashCharges = context.Variables.maxDashCharges;
         context.DashGravity = context.Variables.dashApexHeight / (dashApexTime * dashApexTime);
-        context.InitialDashVerticalVelocity = Mathf.Sqrt(2f * context.JumpGravity * context.Variables.dashApexHeight);
+        context.InitialDashVerticalVelocity = Mathf.Sqrt(2f * Mathf.Abs(context.JumpGravity) * context.Variables.dashApexHeight);
         context.InitialDashHorizontalVelocity = context.Variables.dashDistance / context.Variables.dashDuration;
 
         context.CurrentGravity = context.JumpGravity;
     }
 
     /// <summary>
-    /// Get the Forward Direction of the Player
+    /// Returns the direction used for dashing.
+    /// <para/>
+    /// Aim mode:
+    ///     Dash follows camera orientation.
+    /// Normal mode:
+    ///     Dash follows player facing direction.
     /// </summary>
-    /// <returns> Vector3 Player Forward </returns>
+    /// <returns>Normalized dash direction vector</returns>
     public Vector3 GetDashDirection()
     {
         if (_currentCameraState is PlayerAimCamera)
@@ -233,12 +262,13 @@ public class PlayerController : MonoBehaviour
     }
 
     // ─────────────── Cursor ─────────────── 
+    /// <summary> Hides and Locks mouse </summary>
     public void HideMouse()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-
+    /// <summary> Unhides and Unlockls mouse  </summary>
     public void UnhideMouse()
     {
         Cursor.lockState = CursorLockMode.None;
